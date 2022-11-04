@@ -8,7 +8,7 @@ export default function Song({ song }: { song: SongsQuery['songs'][number] }) {
     <Link href={routes.song(song.title)} style={{ width: '100%' }}>
       <Paper style={{ width: '100%' }}>
         <Stack padding="1rem">
-          <Typography component="h1" variant="h4">
+          <Typography component="h1" variant="h4" whiteSpace="break-spaces">
             {song.title}
           </Typography>
           <Typography>
