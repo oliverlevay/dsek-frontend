@@ -12,6 +12,11 @@ export default function Song({ song }: { song: SongsQuery['songs'][number] }) {
             {song.title}
           </Typography>
           <Typography whiteSpace="break-spaces">
+            Skapad:
+            {' '}
+            {song.created_at.slice(0, 10)}
+          </Typography>
+          <Typography whiteSpace="break-spaces">
             Categori:
             {' '}
             {song.category}
