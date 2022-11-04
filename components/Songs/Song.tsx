@@ -11,12 +11,12 @@ export default function Song({ song }: { song: SongsQuery['songs'][number] }) {
           <Typography component="h1" variant="h4" whiteSpace="break-spaces">
             {song.title}
           </Typography>
-          <Typography>
+          <Typography whiteSpace="break-spaces">
             Categori:
             {' '}
             {song.category}
           </Typography>
-          <Typography>
+          <Typography whiteSpace="break-spaces">
             Melodi:
             {' '}
             {song.melody}
