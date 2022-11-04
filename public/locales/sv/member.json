@@ -1,0 +1,14 @@
+{
+  "loadingMember": "Laddar medlem...",
+  "failedLoadingMember": "Misslyckades med att hämta medlem",
+  "memberError": "Medlem trasig",
+  "firstName": "Förnamn",
+  "lastName": "Efternamn",
+  "nickname": "Smeknamn",
+  "classProgramme": "Program",
+  "classYear": "Årskurs",
+  "editMember": "Redigera profil",
+  "firstSignInDesc": "Fyll in din information nedan",
+  "changeProfilePicture": "Byt profilbild",
+  "uploadNewPicture": "Ladda upp ny bild"
+}

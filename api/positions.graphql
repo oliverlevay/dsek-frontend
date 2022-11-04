@@ -1,0 +1,42 @@
+query PositionsByCommittee($committeeId: UUID) {
+  positions(filter: { committee_id: $committeeId }, perPage: 1000) {
+    positions {
+      id
+      name
+      nameEn
+      committee {
+        name
+        shortName
+      }
+      activeMandates {
+        id
+        start_date
+        end_date
+        position {
+          name
+          nameEn
+          id
+        }
+        member {
+          id
+          student_id
+          first_name
+          last_name
+        }
+      }
+    }
+    pageInfo {
+      hasNextPage
+    }
+  }
+}
+
+query AllPositions($committeeId: UUID) {
+  positions(filter: { committee_id: $committeeId }, perPage: 1000) {
+    positions {
+      id
+      name
+      nameEn
+    }
+  }
+}

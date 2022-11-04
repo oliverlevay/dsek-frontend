@@ -1,0 +1,11 @@
+mutation UpdateSearchIndex {
+  admin {
+    updateSearchIndex
+  }
+}
+
+mutation SyncMandatesWithKeycloak {
+  admin {
+    syncMandatesWithKeycloak
+  }
+}

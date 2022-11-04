@@ -1,0 +1,12 @@
+{
+  "startDate": "Start date",
+  "startTime": "Start time",
+  "endDate": "End date",
+  "endTime": "End time",
+  "addAccessPolicy": "Add access policy",
+  "accessPolicies": "Access Policies",
+  "hasExpirationDate": "Has expiration date",
+  "name": "Name",
+  "who": "Who",
+  "editApiAccess": "Edit api access"
+}

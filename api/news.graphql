@@ -1,0 +1,280 @@
+query NewsPage($page_number: Int!, $per_page: Int!) {
+  news(page: $page_number, perPage: $per_page) {
+    articles {
+      id
+      slug
+      header
+      headerEn
+      body
+      bodyEn
+      likes
+      isLikedByMe
+      author {
+        __typename
+        ... on Member {
+          id
+          student_id
+          first_name
+          nickname
+          last_name
+          picture_path
+        }
+        ... on Mandate {
+          member {
+            id
+            student_id
+            first_name
+            nickname
+            last_name
+            picture_path
+          }
+          position {
+            id
+            name
+          }
+        }
+      }
+      imageUrl
+      publishedDatetime
+      latestEditDatetime
+      tags {
+        id
+        name
+        nameEn
+        color
+        icon
+      }
+    }
+    pageInfo {
+      totalPages
+    }
+  }
+}
+
+query NewsPageInfo($page_number: Int!, $per_page: Int!) {
+  news(page: $page_number, perPage: $per_page) {
+    pageInfo {
+      totalPages
+      totalItems
+      hasNextPage
+      hasPreviousPage
+    }
+  }
+}
+
+query Article($id: UUID, $slug: String) {
+  article(id: $id, slug: $slug) {
+    id
+    slug
+    body
+    bodyEn
+    header
+    headerEn
+    likes
+    isLikedByMe
+    author {
+      __typename
+      ... on Member {
+        id
+        student_id
+        first_name
+        nickname
+        last_name
+        picture_path
+      }
+      ... on Mandate {
+        member {
+          id
+          student_id
+          first_name
+          nickname
+          last_name
+          picture_path
+        }
+        position {
+          id
+          name
+        }
+      }
+    }
+    imageUrl
+    publishedDatetime
+    tags {
+      id
+      name
+      nameEn
+      color
+      icon
+    }
+  }
+}
+
+query ArticleToEdit($id: UUID!) {
+  article(id: $id) {
+    id
+    slug
+    body
+    bodyEn
+    header
+    headerEn
+    author {
+      __typename
+      ... on Member {
+        id
+        student_id
+        first_name
+        nickname
+        last_name
+        mandates(onlyActive: true) {
+          id
+          position {
+            id
+            name
+            nameEn
+          }
+        }
+        picture_path
+      }
+      ... on Mandate {
+        id
+        member {
+          id
+          student_id
+          first_name
+          nickname
+          last_name
+          mandates(onlyActive: true) {
+            id
+            position {
+              id
+              name
+              nameEn
+            }
+          }
+          picture_path
+        }
+        position {
+          id
+          name
+        }
+      }
+    }
+    imageUrl
+    publishedDatetime
+    tags {
+      id
+      name
+      nameEn
+      color
+      icon
+    }
+  }
+}
+
+mutation UpdateArticle(
+  $id: UUID!
+  $header: String
+  $body: String
+  $headerEn: String
+  $bodyEn: String
+  $imageName: String
+  $mandateId: UUID
+  $tagIds: [UUID!]
+) {
+  article {
+    update(
+      id: $id
+      input: {
+        header: $header
+        body: $body
+        headerEn: $headerEn
+        bodyEn: $bodyEn
+        imageName: $imageName
+        mandateId: $mandateId
+        tagIds: $tagIds
+      }
+    ) {
+      article {
+        id
+        header
+        body
+        headerEn
+        bodyEn
+        imageUrl
+      }
+      uploadUrl
+    }
+  }
+}
+
+mutation CreateArticle(
+  $header: String!
+  $body: String!
+  $headerEn: String!
+  $bodyEn: String!
+  $imageName: String
+  $mandateId: UUID
+  $tagIds: [UUID!]
+  $sendNotification: Boolean
+) {
+  article {
+    create(
+      input: {
+        header: $header
+        body: $body
+        headerEn: $headerEn
+        bodyEn: $bodyEn
+        imageName: $imageName
+        mandateId: $mandateId
+        tagIds: $tagIds
+        sendNotification: $sendNotification
+      }
+    ) {
+      article {
+        id
+        header
+        body
+        headerEn
+        bodyEn
+        imageUrl
+      }
+      uploadUrl
+    }
+  }
+}
+
+mutation LikeArticle($id: UUID!) {
+  article {
+    like(id: $id) {
+      article {
+        id
+      }
+    }
+  }
+}
+
+mutation DislikeArticle($id: UUID!) {
+  article {
+    dislike(id: $id) {
+      article {
+        id
+      }
+    }
+  }
+}
+
+mutation RemoveArticle($id: UUID!) {
+  article {
+    remove(id: $id) {
+      article {
+        id
+      }
+    }
+  }
+}
+
+mutation getPresignedPutUrl($fileName: String!) {
+  article {
+    presignedPutUrl(fileName: $fileName)
+  }
+}

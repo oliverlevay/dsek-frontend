@@ -1,0 +1,111 @@
+query MeHeader {
+  me {
+    id
+    student_id
+    first_name
+    nickname
+    last_name
+    picture_path
+    mandates(onlyActive: true) {
+      id
+      position {
+        id
+        name
+        nameEn
+      }
+    }
+  }
+}
+
+query GetMembers {
+  members(perPage: 100) {
+    members {
+      id
+      student_id
+      first_name
+      nickname
+      last_name
+    }
+  }
+}
+
+query MemberPage($id: UUID, $student_id: String) {
+  member(id: $id, student_id: $student_id) {
+    id
+    student_id
+    first_name
+    nickname
+    last_name
+    class_programme
+    class_year
+    picture_path
+    mandates {
+      id
+      start_date
+      end_date
+      position {
+        id
+        name
+        nameEn
+      }
+    }
+  }
+}
+
+mutation CreateMember(
+  $firstName: String!
+  $lastName: String!
+  $classProgramme: String!
+  $classYear: Int!
+  $studentId: String!
+) {
+  member {
+    create(
+      input: {
+        first_name: $firstName
+        last_name: $lastName
+        class_programme: $classProgramme
+        class_year: $classYear
+        student_id: $studentId
+      }
+    ) {
+      id
+      student_id
+      first_name
+      last_name
+      class_programme
+      class_year
+    }
+  }
+}
+
+mutation UpdateMember(
+  $id: UUID!
+  $firstName: String
+  $lastName: String
+  $nickname: String
+  $classProgramme: String
+  $classYear: Int
+  $picturePath: String
+) {
+  member {
+    update(
+      id: $id
+      input: {
+        first_name: $firstName
+        last_name: $lastName
+        nickname: $nickname
+        class_programme: $classProgramme
+        class_year: $classYear
+        picture_path: $picturePath
+      }
+    ) {
+      first_name
+      last_name
+      nickname
+      class_programme
+      class_year
+      picture_path
+    }
+  }
+}

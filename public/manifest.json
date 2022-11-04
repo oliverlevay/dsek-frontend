@@ -1,0 +1,20 @@
+{
+  "short_name": "D-sektionen",
+  "name": "Medlemssida för D-sektionen inom TLTH",
+  "icons": [
+    {
+      "src": "favicon/D-favicon-32.png",
+      "sizes": "32x32 24x24 16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon/D-favicon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
