@@ -15,7 +15,6 @@ import {
   Typography,
 } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
-import * as FileType from 'file-type/browser';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import { useGetPresignedPutUrlMutation } from '~/generated/graphql';
 import putFile from '~/functions/putFile';
@@ -60,10 +59,8 @@ export default function ArticleEditorItem({
     onError: (error) => handleApolloError(error, showMessage, t),
   });
 
-  const saveImage = async function* (inputData: ArrayBuffer) {
-    const fileType = await FileType.fromBuffer(inputData);
-    const file = new File([inputData], 'name', { type: fileType.mime });
-    setFileName(`public/${uuidv4()}.${fileType.ext}`);
+  const saveImage = async function* (_, file: File) {
+    setFileName(`public/${uuidv4()}.${file.name.split('.').pop()}`);
 
     const data = await getPresignedPutUrlMutation();
     putFile(data.data.article.presignedPutUrl, file, file.type, showMessage, t);
