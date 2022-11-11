@@ -1,12 +1,13 @@
 {
   "name": "frontendnext",
-  "version": "0.1.0",
+  "version": "1.0.1",
   "private": true,
   "scripts": {
     "dev": "concurrently \"graphql-codegen --config codegen.yml --watch\" \"next dev\"",
     "build": "next build",
     "start": "next start",
     "generate": "graphql-codegen --config codegen.yml",
+    "test-app": "graphql-codegen --config codegen.app.yml",
     "tsc": "tsc"
   },
   "dependencies": {
