@@ -828,6 +828,7 @@ export type Query = {
   markdowns: Array<Maybe<Markdown>>;
   me?: Maybe<Member>;
   member?: Maybe<Member>;
+  memberById?: Maybe<Member>;
   members?: Maybe<MemberPagination>;
   news?: Maybe<ArticlePagination>;
   positions?: Maybe<PositionPagination>;
@@ -930,6 +931,11 @@ export type QueryMemberArgs = {
 };
 
 
+export type QueryMemberByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']>;
+};
+
+
 export type QueryMembersArgs = {
   filter?: InputMaybe<MemberFilter>;
   page?: Scalars['Int'];
@@ -977,7 +983,7 @@ export type QueryTagArgs = {
 
 
 export type QueryTokenArgs = {
-  expoToken: Scalars['String'];
+  expo_token: Scalars['String'];
 };
 
 
@@ -1025,7 +1031,7 @@ export type TagMutationsUpdateArgs = {
 
 export type Token = {
   __typename?: 'Token';
-  expoToken: Scalars['String'];
+  expo_token: Scalars['String'];
   id: Scalars['UUID'];
   memberId?: Maybe<Scalars['UUID']>;
   tagSubscriptions: Array<Maybe<Tag>>;
@@ -1040,18 +1046,18 @@ export type TokenMutations = {
 
 
 export type TokenMutationsRegisterArgs = {
-  expoToken: Scalars['String'];
+  expo_token: Scalars['String'];
 };
 
 
 export type TokenMutationsSubscribeArgs = {
-  expoToken: Scalars['String'];
+  expo_token: Scalars['String'];
   tagIds: Array<Scalars['UUID']>;
 };
 
 
 export type TokenMutationsUnsubscribeArgs = {
-  expoToken: Scalars['String'];
+  expo_token: Scalars['String'];
   tagIds: Array<Scalars['UUID']>;
 };
 
