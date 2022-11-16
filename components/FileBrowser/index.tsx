@@ -6,7 +6,7 @@ import {
   FullFileBrowser,
 } from 'chonky';
 import { ChonkyIconFA } from 'chonky-icon-fontawesome';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { useTheme } from '@mui/material/styles';
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -33,6 +33,7 @@ import useFileActionHandler from './useFileActionHandler';
 import { useSnackbar } from '~/providers/SnackbarProvider';
 import handleApolloError from '~/functions/handleApolloError';
 import RenameFile from './RenameFile';
+import { useColorMode } from '~/providers/ThemeProvider';
 
 setChonkyDefaults({ iconComponent: ChonkyIconFA });
 
@@ -74,7 +75,7 @@ export default function Browser({ bucket, prefix }: Props) {
     && RenameFile(t),
   ];
 
-  useFilesQuery({
+  const { loading } = useFilesQuery({
     variables: {
       bucket: hasAccess(apiContext, `fileHandler:${bucket}:read`) ? bucket : '',
       prefix: currentPath,
@@ -85,6 +86,15 @@ export default function Browser({ bucket, prefix }: Props) {
     },
     onError: (error) => handleApolloError(error, showMessage, t),
   });
+
+  const { reloadTheme } = useColorMode();
+
+  useEffect(() => {
+    if (!loading) {
+      reloadTheme();
+    }
+  }, [loading]);
+
   usePresignedPutUrlQuery({
     variables: {
       bucket,
@@ -186,9 +196,10 @@ export default function Browser({ bucket, prefix }: Props) {
       <div
         style={{ height: 400 }}
       >
-        <CircularProgress style={{ visibility: uploadFiles.length > 0 ? 'visible' : 'hidden' }} />
+        {apiContext.hasAccess(`fileHandler:${bucket}:create`) && (
+          <CircularProgress style={{ visibility: uploadFiles.length > 0 ? 'visible' : 'hidden' }} />
+        )}
         <MuiThemeProvider theme={theme}>
-
           <FullFileBrowser
             darkMode={theme.palette.mode === 'dark'}
             files={files}

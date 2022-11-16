@@ -1,7 +1,5 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
-import { useKeycloak } from '@react-keycloak/ssr';
-import { KeycloakInstance } from 'keycloak-js';
 import { useNewsPageQuery } from '../../generated/graphql';
 import Article from './article';
 import ArticleSkeleton from './articleSkeleton';
@@ -9,21 +7,20 @@ import ArticleSkeleton from './articleSkeleton';
 type NewsPageProps = {
   pageIndex?: number;
   articlesPerPage?: number;
-  fullArticles?: boolean;
+  tagIds?: string[];
 };
 
 export default function ArticleSet({
   pageIndex = 0,
   articlesPerPage = 10,
-  fullArticles = true,
+  tagIds = [],
 }: NewsPageProps) {
-  const { loading, data, refetch } = useNewsPageQuery({
-    variables: { page_number: pageIndex, per_page: articlesPerPage },
+  const { error, data, refetch } = useNewsPageQuery({
+    variables: { page_number: pageIndex, per_page: articlesPerPage, tagIds },
   });
-  const { initialized } = useKeycloak<KeycloakInstance>();
   const { t } = useTranslation('news');
 
-  if (loading || !initialized) {
+  if (!data?.news) {
     return (
       <>
         <ArticleSkeleton />
@@ -35,7 +32,7 @@ export default function ArticleSet({
     );
   }
 
-  if (!data?.news) return <p>{t('failedLoadingNews')}</p>;
+  if (error) return <p>{t('failedLoadingNews')}</p>;
 
   return (
     <div>
@@ -45,7 +42,6 @@ export default function ArticleSet({
             key={article.id}
             refetch={refetch}
             article={article}
-            fullArticle={fullArticles}
           />
         ) : (
           <div>{t('articleError')}</div>
