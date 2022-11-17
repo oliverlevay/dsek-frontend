@@ -53,6 +53,7 @@ export default function CreateArticlePage() {
   const [imageName, setImageName] = useState('');
   const [tagIds, setTagIds] = useState<string[]>([]);
   const [shouldSendNotification, setShouldSendNotification] = useState(false);
+  const [notificationBody, setNotificationBody] = useState({ sv: '', en: '' });
   const { showMessage } = useSnackbar();
 
   const [createArticleMutation, { loading }] = useCreateArticleMutation({
@@ -65,6 +66,8 @@ export default function CreateArticlePage() {
       mandateId: mandateId !== 'none' ? mandateId : undefined,
       tagIds,
       sendNotification: shouldSendNotification,
+      notificationBody: notificationBody.sv,
+      notificationBodyEn: notificationBody.en,
     },
     onCompleted: () => {
       showMessage(t('publish_successful'), 'success');
@@ -141,6 +144,8 @@ export default function CreateArticlePage() {
           onTagChange={setTagIds}
           sendNotification={shouldSendNotification}
           onSendNotificationChange={setShouldSendNotification}
+          notificationBody={notificationBody}
+          onNotificationBodyChange={setNotificationBody}
         />
       </Paper>
     </NoTitleLayout>

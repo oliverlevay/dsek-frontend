@@ -79,10 +79,14 @@
   "likes_this": "likes this",
   "and": " and ",
   "others": "others",
+  "many_comments": "comments",
+  "one_comment": "comment",
   "likers": "Likers",
   "is_going": "is going",
   "are_going": "are going",
   "is_interested": "is interested",
   "are_interested": "are interested",
-  "kravprofiler": "Requirement profiles"
+  "kravprofiler": "Requirement profiles",
+  "ok": "OK",
+  "cancel": "Cancel"
 }
