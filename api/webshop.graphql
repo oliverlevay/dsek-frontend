@@ -26,3 +26,10 @@ query ProductCategories {
     description
   }
 }
+
+mutation InitiatePayment($phoneNumber: String!) {
+  initiatePayment(phoneNumber: $phoneNumber) {
+    id
+    token
+  }
+}

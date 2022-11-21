@@ -799,6 +799,7 @@ export type Mutation = {
   createProduct: Array<Maybe<Product>>;
   event?: Maybe<EventMutations>;
   files?: Maybe<FileMutations>;
+  initiatePayment: SwishPayment;
   mandate?: Maybe<MandateMutations>;
   markdown?: Maybe<MarkdownMutations>;
   member?: Maybe<MemberMutations>;
@@ -818,6 +819,11 @@ export type MutationAddToMyCartArgs = {
 
 export type MutationCreateProductArgs = {
   input: ProductInput;
+};
+
+
+export type MutationInitiatePaymentArgs = {
+  phoneNumber: Scalars['String'];
 };
 
 
@@ -1172,6 +1178,12 @@ export type Song = {
   melody: Scalars['String'];
   title: Scalars['String'];
   updated_at?: Maybe<Scalars['Date']>;
+};
+
+export type SwishPayment = {
+  __typename?: 'SwishPayment';
+  id: Scalars['String'];
+  token?: Maybe<Scalars['String']>;
 };
 
 export type Tag = {
@@ -1990,6 +2002,13 @@ export type ProductCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type ProductCategoriesQuery = { __typename?: 'Query', productCategories: Array<{ __typename?: 'ProductCategory', id: any, name: string, description: string } | null> };
+
+export type InitiatePaymentMutationVariables = Exact<{
+  phoneNumber: Scalars['String'];
+}>;
+
+
+export type InitiatePaymentMutation = { __typename?: 'Mutation', initiatePayment: { __typename?: 'SwishPayment', id: string, token?: string | null } };
 
 
 export const ApiAccessDocument = gql`
@@ -5774,3 +5793,37 @@ export function useProductCategoriesLazyQuery(baseOptions?: Apollo.LazyQueryHook
 export type ProductCategoriesQueryHookResult = ReturnType<typeof useProductCategoriesQuery>;
 export type ProductCategoriesLazyQueryHookResult = ReturnType<typeof useProductCategoriesLazyQuery>;
 export type ProductCategoriesQueryResult = Apollo.QueryResult<ProductCategoriesQuery, ProductCategoriesQueryVariables>;
+export const InitiatePaymentDocument = gql`
+    mutation InitiatePayment($phoneNumber: String!) {
+  initiatePayment(phoneNumber: $phoneNumber) {
+    id
+    token
+  }
+}
+    `;
+export type InitiatePaymentMutationFn = Apollo.MutationFunction<InitiatePaymentMutation, InitiatePaymentMutationVariables>;
+
+/**
+ * __useInitiatePaymentMutation__
+ *
+ * To run a mutation, you first call `useInitiatePaymentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useInitiatePaymentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [initiatePaymentMutation, { data, loading, error }] = useInitiatePaymentMutation({
+ *   variables: {
+ *      phoneNumber: // value for 'phoneNumber'
+ *   },
+ * });
+ */
+export function useInitiatePaymentMutation(baseOptions?: Apollo.MutationHookOptions<InitiatePaymentMutation, InitiatePaymentMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<InitiatePaymentMutation, InitiatePaymentMutationVariables>(InitiatePaymentDocument, options);
+      }
+export type InitiatePaymentMutationHookResult = ReturnType<typeof useInitiatePaymentMutation>;
+export type InitiatePaymentMutationResult = Apollo.MutationResult<InitiatePaymentMutation>;
+export type InitiatePaymentMutationOptions = Apollo.BaseMutationOptions<InitiatePaymentMutation, InitiatePaymentMutationVariables>;
