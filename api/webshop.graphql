@@ -30,6 +30,23 @@ query ProductCategories {
 mutation InitiatePayment($phoneNumber: String!) {
   initiatePayment(phoneNumber: $phoneNumber) {
     id
-    token
+    amount
+    currency
+    paymentStatus
+    paymentMethod
+    createdAt
+    updatedAt
+  }
+}
+
+mutation UpdatePaymentStatus($paymentId: String!, $status: PaymentStatus!) {
+  updatePaymentStatus(paymentId: $paymentId, status: $status) {
+    id
+    amount
+    currency
+    paymentStatus
+    paymentMethod
+    createdAt
+    updatedAt
   }
 }

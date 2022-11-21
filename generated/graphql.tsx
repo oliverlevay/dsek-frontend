@@ -799,7 +799,7 @@ export type Mutation = {
   createProduct: Array<Maybe<Product>>;
   event?: Maybe<EventMutations>;
   files?: Maybe<FileMutations>;
-  initiatePayment: SwishPayment;
+  initiatePayment: Payment;
   mandate?: Maybe<MandateMutations>;
   markdown?: Maybe<MarkdownMutations>;
   member?: Maybe<MemberMutations>;
@@ -808,6 +808,7 @@ export type Mutation = {
   removeMyCart: Scalars['Boolean'];
   tags?: Maybe<TagMutations>;
   token?: Maybe<TokenMutations>;
+  updatePaymentStatus: Payment;
 };
 
 
@@ -830,6 +831,12 @@ export type MutationInitiatePaymentArgs = {
 export type MutationRemoveFromMyCartArgs = {
   inventoryId: Scalars['UUID'];
   quantity: Scalars['Int'];
+};
+
+
+export type MutationUpdatePaymentStatusArgs = {
+  paymentId: Scalars['String'];
+  status: PaymentStatus;
 };
 
 export type Order = {
@@ -860,9 +867,17 @@ export type Payment = {
   currency: Scalars['String'];
   id: Scalars['UUID'];
   paymentMethod: Scalars['String'];
-  status: Scalars['String'];
+  paymentStatus: Scalars['String'];
   updatedAt: Scalars['Date'];
 };
+
+export enum PaymentStatus {
+  Cancelled = 'CANCELLED',
+  Declined = 'DECLINED',
+  Error = 'ERROR',
+  Paid = 'PAID',
+  Pending = 'PENDING'
+}
 
 export type PolicyMutations = {
   __typename?: 'PolicyMutations';
@@ -1178,12 +1193,6 @@ export type Song = {
   melody: Scalars['String'];
   title: Scalars['String'];
   updated_at?: Maybe<Scalars['Date']>;
-};
-
-export type SwishPayment = {
-  __typename?: 'SwishPayment';
-  id: Scalars['String'];
-  token?: Maybe<Scalars['String']>;
 };
 
 export type Tag = {
@@ -2008,7 +2017,15 @@ export type InitiatePaymentMutationVariables = Exact<{
 }>;
 
 
-export type InitiatePaymentMutation = { __typename?: 'Mutation', initiatePayment: { __typename?: 'SwishPayment', id: string, token?: string | null } };
+export type InitiatePaymentMutation = { __typename?: 'Mutation', initiatePayment: { __typename?: 'Payment', id: any, amount: number, currency: string, paymentStatus: string, paymentMethod: string, createdAt: any, updatedAt: any } };
+
+export type UpdatePaymentStatusMutationVariables = Exact<{
+  paymentId: Scalars['String'];
+  status: PaymentStatus;
+}>;
+
+
+export type UpdatePaymentStatusMutation = { __typename?: 'Mutation', updatePaymentStatus: { __typename?: 'Payment', id: any, amount: number, currency: string, paymentStatus: string, paymentMethod: string, createdAt: any, updatedAt: any } };
 
 
 export const ApiAccessDocument = gql`
@@ -5797,7 +5814,12 @@ export const InitiatePaymentDocument = gql`
     mutation InitiatePayment($phoneNumber: String!) {
   initiatePayment(phoneNumber: $phoneNumber) {
     id
-    token
+    amount
+    currency
+    paymentStatus
+    paymentMethod
+    createdAt
+    updatedAt
   }
 }
     `;
@@ -5827,3 +5849,43 @@ export function useInitiatePaymentMutation(baseOptions?: Apollo.MutationHookOpti
 export type InitiatePaymentMutationHookResult = ReturnType<typeof useInitiatePaymentMutation>;
 export type InitiatePaymentMutationResult = Apollo.MutationResult<InitiatePaymentMutation>;
 export type InitiatePaymentMutationOptions = Apollo.BaseMutationOptions<InitiatePaymentMutation, InitiatePaymentMutationVariables>;
+export const UpdatePaymentStatusDocument = gql`
+    mutation UpdatePaymentStatus($paymentId: String!, $status: PaymentStatus!) {
+  updatePaymentStatus(paymentId: $paymentId, status: $status) {
+    id
+    amount
+    currency
+    paymentStatus
+    paymentMethod
+    createdAt
+    updatedAt
+  }
+}
+    `;
+export type UpdatePaymentStatusMutationFn = Apollo.MutationFunction<UpdatePaymentStatusMutation, UpdatePaymentStatusMutationVariables>;
+
+/**
+ * __useUpdatePaymentStatusMutation__
+ *
+ * To run a mutation, you first call `useUpdatePaymentStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdatePaymentStatusMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updatePaymentStatusMutation, { data, loading, error }] = useUpdatePaymentStatusMutation({
+ *   variables: {
+ *      paymentId: // value for 'paymentId'
+ *      status: // value for 'status'
+ *   },
+ * });
+ */
+export function useUpdatePaymentStatusMutation(baseOptions?: Apollo.MutationHookOptions<UpdatePaymentStatusMutation, UpdatePaymentStatusMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdatePaymentStatusMutation, UpdatePaymentStatusMutationVariables>(UpdatePaymentStatusDocument, options);
+      }
+export type UpdatePaymentStatusMutationHookResult = ReturnType<typeof useUpdatePaymentStatusMutation>;
+export type UpdatePaymentStatusMutationResult = Apollo.MutationResult<UpdatePaymentStatusMutation>;
+export type UpdatePaymentStatusMutationOptions = Apollo.BaseMutationOptions<UpdatePaymentStatusMutation, UpdatePaymentStatusMutationVariables>;
