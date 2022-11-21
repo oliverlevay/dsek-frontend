@@ -18,7 +18,8 @@ import { MuiThemeProvider } from '@material-ui/core';
  *  import { ThemeProvider } from '@mui/material/styles';
  * does not work.
  */
-import { CircularProgress } from '@mui/material';
+import { CircularProgress, Stack } from '@mui/material';
+import { styled } from '@mui/system';
 import {
   useFilesQuery,
   useMoveObjectsMutation,
@@ -41,6 +42,12 @@ type Props = {
   bucket: string;
   prefix: string;
 };
+
+const StyledStack = styled(Stack)`
+  div {
+    opacity: 1;
+  }
+`;
 
 /* interface CustomFileData extends FileData {
   parentId?: string;
@@ -193,8 +200,8 @@ export default function Browser({ bucket, prefix }: Props) {
   );
   return (
     <>
-      <div
-        style={{ height: 400 }}
+      <StyledStack
+        sx={{ height: { xs: 500, sm: 625 } }}
       >
         {apiContext.hasAccess(`fileHandler:${bucket}:create`) && (
           <CircularProgress style={{ visibility: uploadFiles.length > 0 ? 'visible' : 'hidden' }} />
@@ -211,7 +218,7 @@ export default function Browser({ bucket, prefix }: Props) {
             clearSelectionOnOutsideClick
           />
         </MuiThemeProvider>
-      </div>
+      </StyledStack>
       {hasAccess(apiContext, `fileHandler:${bucket}:create`) && (
         <UploadModal
           open={uploadModalOpen}

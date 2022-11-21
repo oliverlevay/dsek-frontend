@@ -72,16 +72,15 @@ export default function Article({
 
   const markdown = selectTranslation(i18n, article.body, article.bodyEn);
 
-  const [truncateBody, setTruncateBody] = useState(false);
+  const [truncateBody, setTruncateBody] = useState(true);
 
-  // Use layout effect to get height of markdown element before rendering
   useEffect(() => {
     if (fullArticle) {
       setTruncateBody(false);
-      return;
+    } else if (markdownRef?.current) {
+      setTruncateBody(markdownRef.current.clientHeight > 200);
     }
-    setTruncateBody(markdownRef.current.clientHeight > 200);
-  }, [markdownRef, markdown, fullArticle]);
+  }, [markdownRef.current]);
 
   return (
     <Paper className={classes.article} component="article">
@@ -161,7 +160,7 @@ export default function Article({
                 a: Link,
               }}
             >
-              {markdown}
+              {truncateBody ? `${markdown.slice(0, 200)}...` : markdown}
             </ReactMarkdown>
           </Box>
         </Grid>
@@ -189,7 +188,7 @@ export default function Article({
           direction="row"
           width="100%"
           alignItems="center"
-          justifyContent="space-between"
+          justifyContent="space-around"
         >
           <LikeButton
             isLikedByMe={article.isLikedByMe}

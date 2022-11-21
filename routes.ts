@@ -1,5 +1,7 @@
 const routes = {
   root: '/',
+  webshop: '/webshop',
+  cart: '/webshop/cart',
   onboarding: '/onboarding',
   article: (articleId) => `/news/article/${articleId}`,
   member: (memberId) => `/members/${memberId}`,
@@ -32,6 +34,8 @@ const routes = {
   calendar: '/calendar',
   calendarDownload: (langaugeCode) => `/api/calendar/download/${langaugeCode}`,
   searchApi: '/api/search',
+  eventsSearchApi: '/api/searchevents',
+  articlesSearchApi: '/api/searcharticles',
   booking: '/booking',
   bookables: '/booking/bookables',
   editBookable: (id) => `/booking/bookables/${id}`,

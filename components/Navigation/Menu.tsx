@@ -11,6 +11,7 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import EmailIcon from '@mui/icons-material/Email';
 import FormatColorTextIcon from '@mui/icons-material/FormatColorText';
 import LibraryMusicIcon from '@mui/icons-material/LibraryMusic';
+import StorefrontIcon from '@mui/icons-material/Storefront';
 import { DateTime } from 'luxon';
 import EditCalendarIcon from '../Icons/EditCalendarIcon';
 import routes from '~/routes';
@@ -38,6 +39,12 @@ const menu: NavigationItem[] = [
         hasAccess: () => true,
       },
     ],
+  },
+  {
+    translationKey: 'Webshop',
+    path: routes.webshop,
+    icon: <StorefrontIcon color="primary" />,
+    hasAccess: () => true,
   },
   {
     translationKey: 'documents',
@@ -128,12 +135,6 @@ const menu: NavigationItem[] = [
     hasAccess: () => true,
   },
   {
-    translationKey: 'songs',
-    path: routes.songs,
-    icon: <LibraryMusicIcon color="primary" />,
-    hasAccess: () => true,
-  },
-  {
     translationKey: 'admin',
     icon: <AdminPanelSettingsIcon color="primary" />,
     path: '',
@@ -176,6 +177,12 @@ const menu: NavigationItem[] = [
       },
 
     ],
+  },
+  {
+    translationKey: 'songs',
+    path: routes.songs,
+    icon: <LibraryMusicIcon color="primary" />,
+    hasAccess: () => true,
   },
 ];
 

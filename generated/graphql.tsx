@@ -230,6 +230,27 @@ export enum BookingStatus {
   Pending = 'PENDING'
 }
 
+export type Cart = {
+  __typename?: 'Cart';
+  cartItems: Array<Maybe<CartItem>>;
+  expiresAt: Scalars['Date'];
+  id: Scalars['UUID'];
+  totalPrice: Scalars['Float'];
+  totalQuantity: Scalars['Int'];
+};
+
+export type CartItem = {
+  __typename?: 'CartItem';
+  category?: Maybe<ProductCategory>;
+  description: Scalars['String'];
+  id: Scalars['UUID'];
+  imageUrl: Scalars['String'];
+  inventory: Array<Maybe<Inventory>>;
+  maxPerUser: Scalars['Int'];
+  name: Scalars['String'];
+  price: Scalars['Float'];
+};
+
 export type Comment = {
   __typename?: 'Comment';
   content: Scalars['String'];
@@ -335,6 +356,7 @@ export type CreateDoorAccessPolicy = {
 };
 
 export type CreateEvent = {
+  alarm_active?: InputMaybe<Scalars['Boolean']>;
   description: Scalars['String'];
   description_en?: InputMaybe<Scalars['String']>;
   end_datetime: Scalars['Datetime'];
@@ -392,6 +414,14 @@ export type CreateTag = {
   nameEn?: InputMaybe<Scalars['String']>;
 };
 
+export type Discount = {
+  __typename?: 'Discount';
+  description: Scalars['String'];
+  discountPercentage: Scalars['Float'];
+  id: Scalars['UUID'];
+  name: Scalars['String'];
+};
+
 export type Door = {
   __typename?: 'Door';
   accessPolicies?: Maybe<Array<AccessPolicy>>;
@@ -419,6 +449,7 @@ export type DoorMutationsRemoveArgs = {
 
 export type Event = {
   __typename?: 'Event';
+  alarm_active?: Maybe<Scalars['Boolean']>;
   author: Member;
   comments: Array<Maybe<Comment>>;
   description: Scalars['String'];
@@ -569,6 +600,14 @@ export type FileMutationsRenameArgs = {
   bucket: Scalars['String'];
   fileName: Scalars['String'];
   newFileName: Scalars['String'];
+};
+
+export type Inventory = {
+  __typename?: 'Inventory';
+  discount?: Maybe<Discount>;
+  id: Scalars['UUID'];
+  quantity: Scalars['Int'];
+  variant?: Maybe<Scalars['String']>;
 };
 
 export type MailAlias = {
@@ -741,20 +780,51 @@ export type MemberPagination = {
 export type Mutation = {
   __typename?: 'Mutation';
   access?: Maybe<AccessMutations>;
+  addToMyCart?: Maybe<Cart>;
   admin?: Maybe<AdminMutations>;
   alias?: Maybe<MailAliasMutations>;
   article?: Maybe<ArticleMutations>;
   bookable?: Maybe<BookableMutations>;
   bookingRequest?: Maybe<BookingRequestMutations>;
   committee?: Maybe<CommitteeMutations>;
+  createProduct: Array<Maybe<Product>>;
   event?: Maybe<EventMutations>;
   files?: Maybe<FileMutations>;
   mandate?: Maybe<MandateMutations>;
   markdown?: Maybe<MarkdownMutations>;
   member?: Maybe<MemberMutations>;
   position?: Maybe<PositionMutations>;
+  removeFromMyCart?: Maybe<Cart>;
   tags?: Maybe<TagMutations>;
   token?: Maybe<TokenMutations>;
+};
+
+
+export type MutationAddToMyCartArgs = {
+  inventoryId: Scalars['UUID'];
+  quantity: Scalars['Int'];
+};
+
+
+export type MutationCreateProductArgs = {
+  input: ProductInput;
+};
+
+
+export type MutationRemoveFromMyCartArgs = {
+  inventoryId: Scalars['UUID'];
+  quantity: Scalars['Int'];
+};
+
+export type Order = {
+  __typename?: 'Order';
+  createdAt: Scalars['Date'];
+  id: Scalars['UUID'];
+  payment?: Maybe<Payment>;
+  products?: Maybe<Array<Maybe<Product>>>;
+  total: Scalars['Float'];
+  updatedAt: Scalars['Date'];
+  user: Member;
 };
 
 export type PaginationInfo = {
@@ -765,6 +835,17 @@ export type PaginationInfo = {
   perPage: Scalars['Int'];
   totalItems: Scalars['Int'];
   totalPages: Scalars['Int'];
+};
+
+export type Payment = {
+  __typename?: 'Payment';
+  amount: Scalars['Float'];
+  createdAt: Scalars['Date'];
+  currency: Scalars['String'];
+  id: Scalars['UUID'];
+  paymentMethod: Scalars['String'];
+  status: Scalars['String'];
+  updatedAt: Scalars['Date'];
 };
 
 export type PolicyMutations = {
@@ -836,10 +917,42 @@ export type PositionPagination = {
   positions: Array<Maybe<Position>>;
 };
 
+export type Product = {
+  __typename?: 'Product';
+  category?: Maybe<ProductCategory>;
+  description: Scalars['String'];
+  id: Scalars['UUID'];
+  imageUrl: Scalars['String'];
+  inventory: Array<Maybe<Inventory>>;
+  maxPerUser: Scalars['Int'];
+  name: Scalars['String'];
+  price: Scalars['Float'];
+};
+
+export type ProductCategory = {
+  __typename?: 'ProductCategory';
+  description: Scalars['String'];
+  id: Scalars['UUID'];
+  name: Scalars['String'];
+};
+
+export type ProductInput = {
+  categoryId: Scalars['UUID'];
+  description: Scalars['String'];
+  discountId?: InputMaybe<Scalars['UUID']>;
+  imageUrl: Scalars['String'];
+  maxPerUser?: InputMaybe<Scalars['Int']>;
+  name: Scalars['String'];
+  price: Scalars['Float'];
+  quantity: Scalars['Int'];
+  variant?: InputMaybe<Scalars['String']>;
+};
+
 export type Query = {
   __typename?: 'Query';
   _entities: Array<Maybe<_Entity>>;
   _service: _Service;
+  alarmShouldBeActive: Scalars['Boolean'];
   alias?: Maybe<MailAlias>;
   aliases?: Maybe<Array<Maybe<MailAlias>>>;
   api?: Maybe<Api>;
@@ -863,9 +976,13 @@ export type Query = {
   member?: Maybe<Member>;
   memberById?: Maybe<Member>;
   members?: Maybe<MemberPagination>;
+  myCart?: Maybe<Cart>;
   news?: Maybe<ArticlePagination>;
   positions?: Maybe<PositionPagination>;
   presignedPutUrl?: Maybe<Scalars['String']>;
+  product?: Maybe<Product>;
+  productCategories: Array<Maybe<ProductCategory>>;
+  products: Array<Maybe<Product>>;
   resolveAlias?: Maybe<Array<Maybe<Scalars['String']>>>;
   resolveRecipients: Array<Maybe<MailRecipient>>;
   songById?: Maybe<Song>;
@@ -993,6 +1110,16 @@ export type QueryPositionsArgs = {
 export type QueryPresignedPutUrlArgs = {
   bucket: Scalars['String'];
   fileName: Scalars['String'];
+};
+
+
+export type QueryProductArgs = {
+  id: Scalars['UUID'];
+};
+
+
+export type QueryProductsArgs = {
+  categoryId?: InputMaybe<Scalars['UUID']>;
 };
 
 
@@ -1135,6 +1262,7 @@ export type UpdateCommittee = {
 };
 
 export type UpdateEvent = {
+  alarm_active?: InputMaybe<Scalars['Boolean']>;
   description?: InputMaybe<Scalars['String']>;
   description_en?: InputMaybe<Scalars['String']>;
   end_datetime?: InputMaybe<Scalars['Datetime']>;
@@ -1314,6 +1442,27 @@ export type EditBookableMutationVariables = Exact<{
 
 export type EditBookableMutation = { __typename?: 'Mutation', bookable?: { __typename?: 'BookableMutations', update?: { __typename?: 'Bookable', id: any, name: string, name_en: string, isDisabled: boolean } | null } | null };
 
+export type MyCartQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MyCartQuery = { __typename?: 'Query', myCart?: { __typename?: 'Cart', id: any, totalPrice: number, totalQuantity: number, expiresAt: any, cartItems: Array<{ __typename?: 'CartItem', id: any, name: string, description: string, price: number, maxPerUser: number, imageUrl: string, inventory: Array<{ __typename?: 'Inventory', id: any, variant?: string | null, quantity: number } | null>, category?: { __typename?: 'ProductCategory', id: any, name: string, description: string } | null } | null> } | null };
+
+export type AddToMyCartMutationVariables = Exact<{
+  inventoryId: Scalars['UUID'];
+  quantity: Scalars['Int'];
+}>;
+
+
+export type AddToMyCartMutation = { __typename?: 'Mutation', addToMyCart?: { __typename?: 'Cart', id: any, totalPrice: number, totalQuantity: number, expiresAt: any, cartItems: Array<{ __typename?: 'CartItem', id: any, name: string, description: string, price: number, maxPerUser: number, imageUrl: string, inventory: Array<{ __typename?: 'Inventory', id: any, variant?: string | null, quantity: number } | null>, category?: { __typename?: 'ProductCategory', id: any, name: string, description: string } | null } | null> } | null };
+
+export type RemoveFromMyCartMutationVariables = Exact<{
+  inventoryId: Scalars['UUID'];
+  quantity: Scalars['Int'];
+}>;
+
+
+export type RemoveFromMyCartMutation = { __typename?: 'Mutation', removeFromMyCart?: { __typename?: 'Cart', id: any, totalPrice: number, totalQuantity: number, expiresAt: any, cartItems: Array<{ __typename?: 'CartItem', id: any, name: string, description: string, price: number, maxPerUser: number, imageUrl: string, inventory: Array<{ __typename?: 'Inventory', id: any, variant?: string | null, quantity: number } | null>, category?: { __typename?: 'ProductCategory', id: any, name: string, description: string } | null } | null> } | null };
+
 export type GetCommitteesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1367,6 +1516,11 @@ export type DoorAccessQueryVariables = Exact<{
 
 export type DoorAccessQuery = { __typename?: 'Query', door?: { __typename?: 'Door', studentIds?: Array<string> | null } | null };
 
+export type AlarmShouldBeActiveQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AlarmShouldBeActiveQuery = { __typename?: 'Query', alarmShouldBeActive: boolean };
+
 export type EventsQueryVariables = Exact<{
   start_datetime?: InputMaybe<Scalars['Datetime']>;
   end_datetime?: InputMaybe<Scalars['Datetime']>;
@@ -1384,7 +1538,7 @@ export type EventQueryVariables = Exact<{
 }>;
 
 
-export type EventQuery = { __typename?: 'Query', event?: { __typename?: 'Event', title: string, id: any, slug?: string | null, short_description: string, description: string, start_datetime: any, end_datetime: any, link?: string | null, location?: string | null, organizer: string, title_en?: string | null, description_en?: string | null, short_description_en?: string | null, iAmInterested: boolean, iAmGoing: boolean, peopleGoing: Array<{ __typename?: 'Member', id: any, student_id?: string | null, first_name?: string | null, last_name?: string | null, nickname?: string | null, picture_path?: string | null } | null>, peopleInterested: Array<{ __typename?: 'Member', id: any, student_id?: string | null, first_name?: string | null, last_name?: string | null, nickname?: string | null, picture_path?: string | null } | null>, comments: Array<{ __typename?: 'Comment', id: any, published: any, content: string, member: { __typename?: 'Member', id: any, student_id?: string | null, first_name?: string | null, last_name?: string | null, nickname?: string | null, picture_path?: string | null } } | null>, author: { __typename?: 'Member', id: any } } | null };
+export type EventQuery = { __typename?: 'Query', event?: { __typename?: 'Event', title: string, id: any, alarm_active?: boolean | null, slug?: string | null, short_description: string, description: string, start_datetime: any, end_datetime: any, link?: string | null, location?: string | null, organizer: string, title_en?: string | null, description_en?: string | null, short_description_en?: string | null, iAmInterested: boolean, iAmGoing: boolean, peopleGoing: Array<{ __typename?: 'Member', id: any, student_id?: string | null, first_name?: string | null, last_name?: string | null, nickname?: string | null, picture_path?: string | null } | null>, peopleInterested: Array<{ __typename?: 'Member', id: any, student_id?: string | null, first_name?: string | null, last_name?: string | null, nickname?: string | null, picture_path?: string | null } | null>, comments: Array<{ __typename?: 'Comment', id: any, published: any, content: string, member: { __typename?: 'Member', id: any, student_id?: string | null, first_name?: string | null, last_name?: string | null, nickname?: string | null, picture_path?: string | null } } | null>, author: { __typename?: 'Member', id: any } } | null };
 
 export type UpdateEventMutationVariables = Exact<{
   id: Scalars['UUID'];
@@ -1399,6 +1553,7 @@ export type UpdateEventMutationVariables = Exact<{
   title_en?: InputMaybe<Scalars['String']>;
   description_en?: InputMaybe<Scalars['String']>;
   short_description_en?: InputMaybe<Scalars['String']>;
+  alarm_active?: InputMaybe<Scalars['Boolean']>;
 }>;
 
 
@@ -1416,6 +1571,7 @@ export type CreateEventMutationVariables = Exact<{
   title_en?: InputMaybe<Scalars['String']>;
   description_en?: InputMaybe<Scalars['String']>;
   short_description_en?: InputMaybe<Scalars['String']>;
+  alarm_active: Scalars['Boolean'];
 }>;
 
 
@@ -1807,6 +1963,18 @@ export type UpdateTagMutationVariables = Exact<{
 
 
 export type UpdateTagMutation = { __typename?: 'Mutation', tags?: { __typename?: 'TagMutations', update?: { __typename?: 'Tag', id: any, name: string, nameEn: string, icon?: string | null, color?: string | null } | null } | null };
+
+export type ProductsQueryVariables = Exact<{
+  categoryId?: InputMaybe<Scalars['UUID']>;
+}>;
+
+
+export type ProductsQuery = { __typename?: 'Query', products: Array<{ __typename?: 'Product', id: any, name: string, description: string, price: number, maxPerUser: number, imageUrl: string, inventory: Array<{ __typename?: 'Inventory', id: any, variant?: string | null, quantity: number } | null>, category?: { __typename?: 'ProductCategory', id: any, name: string, description: string } | null } | null> };
+
+export type ProductCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ProductCategoriesQuery = { __typename?: 'Query', productCategories: Array<{ __typename?: 'ProductCategory', id: any, name: string, description: string } | null> };
 
 
 export const ApiAccessDocument = gql`
@@ -2452,6 +2620,171 @@ export function useEditBookableMutation(baseOptions?: Apollo.MutationHookOptions
 export type EditBookableMutationHookResult = ReturnType<typeof useEditBookableMutation>;
 export type EditBookableMutationResult = Apollo.MutationResult<EditBookableMutation>;
 export type EditBookableMutationOptions = Apollo.BaseMutationOptions<EditBookableMutation, EditBookableMutationVariables>;
+export const MyCartDocument = gql`
+    query MyCart {
+  myCart {
+    id
+    cartItems {
+      id
+      name
+      description
+      price
+      maxPerUser
+      imageUrl
+      inventory {
+        id
+        variant
+        quantity
+      }
+      category {
+        id
+        name
+        description
+      }
+    }
+    totalPrice
+    totalQuantity
+    expiresAt
+  }
+}
+    `;
+
+/**
+ * __useMyCartQuery__
+ *
+ * To run a query within a React component, call `useMyCartQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMyCartQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMyCartQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMyCartQuery(baseOptions?: Apollo.QueryHookOptions<MyCartQuery, MyCartQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MyCartQuery, MyCartQueryVariables>(MyCartDocument, options);
+      }
+export function useMyCartLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MyCartQuery, MyCartQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MyCartQuery, MyCartQueryVariables>(MyCartDocument, options);
+        }
+export type MyCartQueryHookResult = ReturnType<typeof useMyCartQuery>;
+export type MyCartLazyQueryHookResult = ReturnType<typeof useMyCartLazyQuery>;
+export type MyCartQueryResult = Apollo.QueryResult<MyCartQuery, MyCartQueryVariables>;
+export const AddToMyCartDocument = gql`
+    mutation AddToMyCart($inventoryId: UUID!, $quantity: Int!) {
+  addToMyCart(inventoryId: $inventoryId, quantity: $quantity) {
+    id
+    cartItems {
+      id
+      name
+      description
+      price
+      maxPerUser
+      imageUrl
+      inventory {
+        id
+        variant
+        quantity
+      }
+      category {
+        id
+        name
+        description
+      }
+    }
+    totalPrice
+    totalQuantity
+    expiresAt
+  }
+}
+    `;
+export type AddToMyCartMutationFn = Apollo.MutationFunction<AddToMyCartMutation, AddToMyCartMutationVariables>;
+
+/**
+ * __useAddToMyCartMutation__
+ *
+ * To run a mutation, you first call `useAddToMyCartMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddToMyCartMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addToMyCartMutation, { data, loading, error }] = useAddToMyCartMutation({
+ *   variables: {
+ *      inventoryId: // value for 'inventoryId'
+ *      quantity: // value for 'quantity'
+ *   },
+ * });
+ */
+export function useAddToMyCartMutation(baseOptions?: Apollo.MutationHookOptions<AddToMyCartMutation, AddToMyCartMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddToMyCartMutation, AddToMyCartMutationVariables>(AddToMyCartDocument, options);
+      }
+export type AddToMyCartMutationHookResult = ReturnType<typeof useAddToMyCartMutation>;
+export type AddToMyCartMutationResult = Apollo.MutationResult<AddToMyCartMutation>;
+export type AddToMyCartMutationOptions = Apollo.BaseMutationOptions<AddToMyCartMutation, AddToMyCartMutationVariables>;
+export const RemoveFromMyCartDocument = gql`
+    mutation RemoveFromMyCart($inventoryId: UUID!, $quantity: Int!) {
+  removeFromMyCart(inventoryId: $inventoryId, quantity: $quantity) {
+    id
+    cartItems {
+      id
+      name
+      description
+      price
+      maxPerUser
+      imageUrl
+      inventory {
+        id
+        variant
+        quantity
+      }
+      category {
+        id
+        name
+        description
+      }
+    }
+    totalPrice
+    totalQuantity
+    expiresAt
+  }
+}
+    `;
+export type RemoveFromMyCartMutationFn = Apollo.MutationFunction<RemoveFromMyCartMutation, RemoveFromMyCartMutationVariables>;
+
+/**
+ * __useRemoveFromMyCartMutation__
+ *
+ * To run a mutation, you first call `useRemoveFromMyCartMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveFromMyCartMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeFromMyCartMutation, { data, loading, error }] = useRemoveFromMyCartMutation({
+ *   variables: {
+ *      inventoryId: // value for 'inventoryId'
+ *      quantity: // value for 'quantity'
+ *   },
+ * });
+ */
+export function useRemoveFromMyCartMutation(baseOptions?: Apollo.MutationHookOptions<RemoveFromMyCartMutation, RemoveFromMyCartMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RemoveFromMyCartMutation, RemoveFromMyCartMutationVariables>(RemoveFromMyCartDocument, options);
+      }
+export type RemoveFromMyCartMutationHookResult = ReturnType<typeof useRemoveFromMyCartMutation>;
+export type RemoveFromMyCartMutationResult = Apollo.MutationResult<RemoveFromMyCartMutation>;
+export type RemoveFromMyCartMutationOptions = Apollo.BaseMutationOptions<RemoveFromMyCartMutation, RemoveFromMyCartMutationVariables>;
 export const GetCommitteesDocument = gql`
     query GetCommittees {
   committees(perPage: 50) {
@@ -2756,6 +3089,38 @@ export function useDoorAccessLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions
 export type DoorAccessQueryHookResult = ReturnType<typeof useDoorAccessQuery>;
 export type DoorAccessLazyQueryHookResult = ReturnType<typeof useDoorAccessLazyQuery>;
 export type DoorAccessQueryResult = Apollo.QueryResult<DoorAccessQuery, DoorAccessQueryVariables>;
+export const AlarmShouldBeActiveDocument = gql`
+    query AlarmShouldBeActive {
+  alarmShouldBeActive
+}
+    `;
+
+/**
+ * __useAlarmShouldBeActiveQuery__
+ *
+ * To run a query within a React component, call `useAlarmShouldBeActiveQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAlarmShouldBeActiveQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAlarmShouldBeActiveQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useAlarmShouldBeActiveQuery(baseOptions?: Apollo.QueryHookOptions<AlarmShouldBeActiveQuery, AlarmShouldBeActiveQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AlarmShouldBeActiveQuery, AlarmShouldBeActiveQueryVariables>(AlarmShouldBeActiveDocument, options);
+      }
+export function useAlarmShouldBeActiveLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AlarmShouldBeActiveQuery, AlarmShouldBeActiveQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AlarmShouldBeActiveQuery, AlarmShouldBeActiveQueryVariables>(AlarmShouldBeActiveDocument, options);
+        }
+export type AlarmShouldBeActiveQueryHookResult = ReturnType<typeof useAlarmShouldBeActiveQuery>;
+export type AlarmShouldBeActiveLazyQueryHookResult = ReturnType<typeof useAlarmShouldBeActiveLazyQuery>;
+export type AlarmShouldBeActiveQueryResult = Apollo.QueryResult<AlarmShouldBeActiveQuery, AlarmShouldBeActiveQueryVariables>;
 export const EventsDocument = gql`
     query Events($start_datetime: Datetime, $end_datetime: Datetime, $id: UUID, $page: Int, $perPage: Int) {
   events(
@@ -2842,6 +3207,7 @@ export const EventDocument = gql`
   event(id: $id, slug: $slug) {
     title
     id
+    alarm_active
     slug
     short_description
     description
@@ -2920,11 +3286,11 @@ export type EventQueryHookResult = ReturnType<typeof useEventQuery>;
 export type EventLazyQueryHookResult = ReturnType<typeof useEventLazyQuery>;
 export type EventQueryResult = Apollo.QueryResult<EventQuery, EventQueryVariables>;
 export const UpdateEventDocument = gql`
-    mutation UpdateEvent($id: UUID!, $title: String, $description: String, $short_description: String, $start_datetime: Datetime, $end_datetime: Datetime, $link: String, $location: String, $organizer: String, $title_en: String, $description_en: String, $short_description_en: String) {
+    mutation UpdateEvent($id: UUID!, $title: String, $description: String, $short_description: String, $start_datetime: Datetime, $end_datetime: Datetime, $link: String, $location: String, $organizer: String, $title_en: String, $description_en: String, $short_description_en: String, $alarm_active: Boolean) {
   event {
     update(
       id: $id
-      input: {title: $title, description: $description, short_description: $short_description, start_datetime: $start_datetime, end_datetime: $end_datetime, link: $link, location: $location, organizer: $organizer, title_en: $title_en, description_en: $description_en, short_description_en: $short_description_en}
+      input: {title: $title, description: $description, short_description: $short_description, start_datetime: $start_datetime, end_datetime: $end_datetime, link: $link, location: $location, organizer: $organizer, title_en: $title_en, description_en: $description_en, short_description_en: $short_description_en, alarm_active: $alarm_active}
     ) {
       title
       id
@@ -2972,6 +3338,7 @@ export type UpdateEventMutationFn = Apollo.MutationFunction<UpdateEventMutation,
  *      title_en: // value for 'title_en'
  *      description_en: // value for 'description_en'
  *      short_description_en: // value for 'short_description_en'
+ *      alarm_active: // value for 'alarm_active'
  *   },
  * });
  */
@@ -2983,10 +3350,10 @@ export type UpdateEventMutationHookResult = ReturnType<typeof useUpdateEventMuta
 export type UpdateEventMutationResult = Apollo.MutationResult<UpdateEventMutation>;
 export type UpdateEventMutationOptions = Apollo.BaseMutationOptions<UpdateEventMutation, UpdateEventMutationVariables>;
 export const CreateEventDocument = gql`
-    mutation CreateEvent($title: String!, $description: String!, $short_description: String!, $start_datetime: Datetime!, $end_datetime: Datetime!, $link: String, $location: String!, $organizer: String!, $title_en: String, $description_en: String, $short_description_en: String) {
+    mutation CreateEvent($title: String!, $description: String!, $short_description: String!, $start_datetime: Datetime!, $end_datetime: Datetime!, $link: String, $location: String!, $organizer: String!, $title_en: String, $description_en: String, $short_description_en: String, $alarm_active: Boolean!) {
   event {
     create(
-      input: {title: $title, description: $description, short_description: $short_description, start_datetime: $start_datetime, end_datetime: $end_datetime, link: $link, location: $location, organizer: $organizer, title_en: $title_en, description_en: $description_en, short_description_en: $short_description_en}
+      input: {title: $title, description: $description, short_description: $short_description, start_datetime: $start_datetime, end_datetime: $end_datetime, link: $link, location: $location, organizer: $organizer, title_en: $title_en, description_en: $description_en, short_description_en: $short_description_en, alarm_active: $alarm_active}
     ) {
       title
       id
@@ -3030,6 +3397,7 @@ export type CreateEventMutationFn = Apollo.MutationFunction<CreateEventMutation,
  *      title_en: // value for 'title_en'
  *      description_en: // value for 'description_en'
  *      short_description_en: // value for 'short_description_en'
+ *      alarm_active: // value for 'alarm_active'
  *   },
  * });
  */
@@ -5272,3 +5640,89 @@ export function useUpdateTagMutation(baseOptions?: Apollo.MutationHookOptions<Up
 export type UpdateTagMutationHookResult = ReturnType<typeof useUpdateTagMutation>;
 export type UpdateTagMutationResult = Apollo.MutationResult<UpdateTagMutation>;
 export type UpdateTagMutationOptions = Apollo.BaseMutationOptions<UpdateTagMutation, UpdateTagMutationVariables>;
+export const ProductsDocument = gql`
+    query Products($categoryId: UUID) {
+  products(categoryId: $categoryId) {
+    id
+    name
+    description
+    price
+    maxPerUser
+    imageUrl
+    inventory {
+      id
+      variant
+      quantity
+    }
+    category {
+      id
+      name
+      description
+    }
+  }
+}
+    `;
+
+/**
+ * __useProductsQuery__
+ *
+ * To run a query within a React component, call `useProductsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useProductsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useProductsQuery({
+ *   variables: {
+ *      categoryId: // value for 'categoryId'
+ *   },
+ * });
+ */
+export function useProductsQuery(baseOptions?: Apollo.QueryHookOptions<ProductsQuery, ProductsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ProductsQuery, ProductsQueryVariables>(ProductsDocument, options);
+      }
+export function useProductsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ProductsQuery, ProductsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ProductsQuery, ProductsQueryVariables>(ProductsDocument, options);
+        }
+export type ProductsQueryHookResult = ReturnType<typeof useProductsQuery>;
+export type ProductsLazyQueryHookResult = ReturnType<typeof useProductsLazyQuery>;
+export type ProductsQueryResult = Apollo.QueryResult<ProductsQuery, ProductsQueryVariables>;
+export const ProductCategoriesDocument = gql`
+    query ProductCategories {
+  productCategories {
+    id
+    name
+    description
+  }
+}
+    `;
+
+/**
+ * __useProductCategoriesQuery__
+ *
+ * To run a query within a React component, call `useProductCategoriesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useProductCategoriesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useProductCategoriesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useProductCategoriesQuery(baseOptions?: Apollo.QueryHookOptions<ProductCategoriesQuery, ProductCategoriesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ProductCategoriesQuery, ProductCategoriesQueryVariables>(ProductCategoriesDocument, options);
+      }
+export function useProductCategoriesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ProductCategoriesQuery, ProductCategoriesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ProductCategoriesQuery, ProductCategoriesQueryVariables>(ProductCategoriesDocument, options);
+        }
+export type ProductCategoriesQueryHookResult = ReturnType<typeof useProductCategoriesQuery>;
+export type ProductCategoriesLazyQueryHookResult = ReturnType<typeof useProductCategoriesLazyQuery>;
+export type ProductCategoriesQueryResult = Apollo.QueryResult<ProductCategoriesQuery, ProductCategoriesQueryVariables>;

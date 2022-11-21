@@ -1,10 +1,12 @@
 /* eslint-disable react/jsx-no-duplicate-props */
 import {
-  Avatar, Stack,
+  Avatar, Stack, useTheme,
 } from '@mui/material';
 import { MutableRefObject, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { MentionsInput, Mention } from 'react-mentions';
+import IconButton from '@mui/material/IconButton';
+import SendIcon from '@mui/icons-material/Send';
 import { getFullName } from '~/functions/memberFunctions';
 import { useCommentArticleMutation, useCommentEventMutation } from '~/generated/graphql';
 import { useApiAccess } from '~/providers/ApiAccessProvider';
@@ -20,6 +22,7 @@ interface CommentFieldProps {
 }
 
 export default function CommentField({ id, type, commentInputRef }: CommentFieldProps) {
+  const theme = useTheme();
   const { user } = useUser();
   const { t } = useTranslation();
   const [commentArticle] = useCommentArticleMutation();
@@ -43,7 +46,7 @@ export default function CommentField({ id, type, commentInputRef }: CommentField
       <Avatar src={user?.picture_path} />
       <MentionsInput
         className="mentions_input"
-        style={MentionsStyle}
+        style={MentionsStyle(theme.palette.mode === 'dark')}
         value={content}
         onChange={(e) => setContent(e.target.value)}
         placeholder={t('write_a_comment')}
@@ -79,6 +82,22 @@ export default function CommentField({ id, type, commentInputRef }: CommentField
           }}
         />
       </MentionsInput>
+      <IconButton
+        disabled={!content}
+        onClick={(e) => {
+          e.preventDefault();
+          comment({
+            id,
+            content:
+                 content.trim().replaceAll('@[@', '[@'),
+
+          }).then(() => {
+            setContent('');
+          });
+        }}
+      >
+        <SendIcon />
+      </IconButton>
     </Stack>
   );
 }
