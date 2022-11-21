@@ -239,13 +239,22 @@ export type Cart = {
   totalQuantity: Scalars['Int'];
 };
 
+export type CartInventory = {
+  __typename?: 'CartInventory';
+  discount?: Maybe<Discount>;
+  id: Scalars['UUID'];
+  inventoryId: Scalars['UUID'];
+  quantity: Scalars['Int'];
+  variant?: Maybe<Scalars['String']>;
+};
+
 export type CartItem = {
   __typename?: 'CartItem';
   category?: Maybe<ProductCategory>;
   description: Scalars['String'];
   id: Scalars['UUID'];
   imageUrl: Scalars['String'];
-  inventory: Array<Maybe<Inventory>>;
+  inventory: Array<Maybe<CartInventory>>;
   maxPerUser: Scalars['Int'];
   name: Scalars['String'];
   price: Scalars['Float'];
@@ -795,6 +804,7 @@ export type Mutation = {
   member?: Maybe<MemberMutations>;
   position?: Maybe<PositionMutations>;
   removeFromMyCart?: Maybe<Cart>;
+  removeMyCart: Scalars['Boolean'];
   tags?: Maybe<TagMutations>;
   token?: Maybe<TokenMutations>;
 };
@@ -1445,7 +1455,7 @@ export type EditBookableMutation = { __typename?: 'Mutation', bookable?: { __typ
 export type MyCartQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MyCartQuery = { __typename?: 'Query', myCart?: { __typename?: 'Cart', id: any, totalPrice: number, totalQuantity: number, expiresAt: any, cartItems: Array<{ __typename?: 'CartItem', id: any, name: string, description: string, price: number, maxPerUser: number, imageUrl: string, inventory: Array<{ __typename?: 'Inventory', id: any, variant?: string | null, quantity: number } | null>, category?: { __typename?: 'ProductCategory', id: any, name: string, description: string } | null } | null> } | null };
+export type MyCartQuery = { __typename?: 'Query', myCart?: { __typename?: 'Cart', id: any, totalPrice: number, totalQuantity: number, expiresAt: any, cartItems: Array<{ __typename?: 'CartItem', id: any, name: string, description: string, price: number, maxPerUser: number, imageUrl: string, inventory: Array<{ __typename?: 'CartInventory', id: any, inventoryId: any, variant?: string | null, quantity: number } | null>, category?: { __typename?: 'ProductCategory', id: any, name: string, description: string } | null } | null> } | null };
 
 export type AddToMyCartMutationVariables = Exact<{
   inventoryId: Scalars['UUID'];
@@ -1453,7 +1463,7 @@ export type AddToMyCartMutationVariables = Exact<{
 }>;
 
 
-export type AddToMyCartMutation = { __typename?: 'Mutation', addToMyCart?: { __typename?: 'Cart', id: any, totalPrice: number, totalQuantity: number, expiresAt: any, cartItems: Array<{ __typename?: 'CartItem', id: any, name: string, description: string, price: number, maxPerUser: number, imageUrl: string, inventory: Array<{ __typename?: 'Inventory', id: any, variant?: string | null, quantity: number } | null>, category?: { __typename?: 'ProductCategory', id: any, name: string, description: string } | null } | null> } | null };
+export type AddToMyCartMutation = { __typename?: 'Mutation', addToMyCart?: { __typename?: 'Cart', id: any, totalPrice: number, totalQuantity: number, expiresAt: any, cartItems: Array<{ __typename?: 'CartItem', id: any, name: string, description: string, price: number, maxPerUser: number, imageUrl: string, inventory: Array<{ __typename?: 'CartInventory', id: any, inventoryId: any, variant?: string | null, quantity: number } | null>, category?: { __typename?: 'ProductCategory', id: any, name: string, description: string } | null } | null> } | null };
 
 export type RemoveFromMyCartMutationVariables = Exact<{
   inventoryId: Scalars['UUID'];
@@ -1461,7 +1471,12 @@ export type RemoveFromMyCartMutationVariables = Exact<{
 }>;
 
 
-export type RemoveFromMyCartMutation = { __typename?: 'Mutation', removeFromMyCart?: { __typename?: 'Cart', id: any, totalPrice: number, totalQuantity: number, expiresAt: any, cartItems: Array<{ __typename?: 'CartItem', id: any, name: string, description: string, price: number, maxPerUser: number, imageUrl: string, inventory: Array<{ __typename?: 'Inventory', id: any, variant?: string | null, quantity: number } | null>, category?: { __typename?: 'ProductCategory', id: any, name: string, description: string } | null } | null> } | null };
+export type RemoveFromMyCartMutation = { __typename?: 'Mutation', removeFromMyCart?: { __typename?: 'Cart', id: any, totalPrice: number, totalQuantity: number, expiresAt: any, cartItems: Array<{ __typename?: 'CartItem', id: any, name: string, description: string, price: number, maxPerUser: number, imageUrl: string, inventory: Array<{ __typename?: 'CartInventory', id: any, inventoryId: any, variant?: string | null, quantity: number } | null>, category?: { __typename?: 'ProductCategory', id: any, name: string, description: string } | null } | null> } | null };
+
+export type RemoveMyCartMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type RemoveMyCartMutation = { __typename?: 'Mutation', removeMyCart: boolean };
 
 export type GetCommitteesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2633,6 +2648,7 @@ export const MyCartDocument = gql`
       imageUrl
       inventory {
         id
+        inventoryId
         variant
         quantity
       }
@@ -2688,6 +2704,7 @@ export const AddToMyCartDocument = gql`
       imageUrl
       inventory {
         id
+        inventoryId
         variant
         quantity
       }
@@ -2743,6 +2760,7 @@ export const RemoveFromMyCartDocument = gql`
       imageUrl
       inventory {
         id
+        inventoryId
         variant
         quantity
       }
@@ -2785,6 +2803,36 @@ export function useRemoveFromMyCartMutation(baseOptions?: Apollo.MutationHookOpt
 export type RemoveFromMyCartMutationHookResult = ReturnType<typeof useRemoveFromMyCartMutation>;
 export type RemoveFromMyCartMutationResult = Apollo.MutationResult<RemoveFromMyCartMutation>;
 export type RemoveFromMyCartMutationOptions = Apollo.BaseMutationOptions<RemoveFromMyCartMutation, RemoveFromMyCartMutationVariables>;
+export const RemoveMyCartDocument = gql`
+    mutation RemoveMyCart {
+  removeMyCart
+}
+    `;
+export type RemoveMyCartMutationFn = Apollo.MutationFunction<RemoveMyCartMutation, RemoveMyCartMutationVariables>;
+
+/**
+ * __useRemoveMyCartMutation__
+ *
+ * To run a mutation, you first call `useRemoveMyCartMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveMyCartMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeMyCartMutation, { data, loading, error }] = useRemoveMyCartMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useRemoveMyCartMutation(baseOptions?: Apollo.MutationHookOptions<RemoveMyCartMutation, RemoveMyCartMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RemoveMyCartMutation, RemoveMyCartMutationVariables>(RemoveMyCartDocument, options);
+      }
+export type RemoveMyCartMutationHookResult = ReturnType<typeof useRemoveMyCartMutation>;
+export type RemoveMyCartMutationResult = Apollo.MutationResult<RemoveMyCartMutation>;
+export type RemoveMyCartMutationOptions = Apollo.BaseMutationOptions<RemoveMyCartMutation, RemoveMyCartMutationVariables>;
 export const GetCommitteesDocument = gql`
     query GetCommittees {
   committees(perPage: 50) {
