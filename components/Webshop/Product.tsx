@@ -52,7 +52,13 @@ export default function Product({ product }: { product: ProductsQuery['products'
   }, [product]);
 
   return (
-    <Card sx={{ margin: '0.5rem', width: { xs: '100%', sm: '20rem' } }}>
+    <Card sx={{
+      margin: '0.5rem',
+      width: { xs: '100%', sm: '20rem' },
+      display: 'flex',
+      flexDirection: 'column',
+    }}
+    >
       <CardHeader
         title={product.name}
         sx={{
@@ -91,7 +97,7 @@ export default function Product({ product }: { product: ProductsQuery['products'
           man får köpa
         </Typography>
       </CardContent>
-      <CardActions>
+      <CardActions sx={{ marginTop: 'auto' }}>
         <Stack alignItems="center" width="100%" spacing={1}>
           {product.inventory.length > 1 && (
           <FormControl fullWidth>
