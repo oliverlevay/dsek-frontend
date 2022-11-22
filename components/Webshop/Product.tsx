@@ -52,7 +52,7 @@ export default function Product({ product }: { product: ProductsQuery['products'
   }, [product]);
 
   return (
-    <Card sx={{ margin: '0.5rem', width: { xs: '100%', sm: 'unset' } }}>
+    <Card sx={{ margin: '0.5rem', width: { xs: '100%', sm: '20rem' } }}>
       <CardHeader
         title={product.name}
         sx={{
@@ -120,7 +120,7 @@ export default function Product({ product }: { product: ProductsQuery['products'
           </FormControl>
           )}
           <Button
-            aria-label={t('add_to_cart')}
+            aria-label={t('webshop:add_to_cart')}
             variant="contained"
             disabled={
               selectedVariant.quantity === 0
@@ -137,7 +137,7 @@ export default function Product({ product }: { product: ProductsQuery['products'
             })}
           >
             <AddShoppingCartIcon style={{ marginRight: '1rem' }} />
-            {t('add_to_cart')}
+            {t('webshop:add_to_cart')}
           </Button>
         </Stack>
       </CardActions>
