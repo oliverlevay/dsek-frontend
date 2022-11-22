@@ -15,7 +15,7 @@ export default function CartPage() {
   const { data } = useMyCartQuery();
   const [phoneNumber, setPhoneNumber] = useState('');
   const router = useRouter();
-  const [initiatePayment, { error }] = useInitiatePaymentMutation(
+  const [initiatePayment, { error, loading }] = useInitiatePaymentMutation(
     { variables: { phoneNumber } },
   );
   return (
@@ -42,6 +42,7 @@ export default function CartPage() {
         <LoadingButton
           sx={{ width: 300 }}
           variant="contained"
+          loading={loading}
           onClick={() => {
             initiatePayment().then(({ data: paymentData }) => {
               router.push(routes.awaitPayment(paymentData?.initiatePayment?.id));
