@@ -1,9 +1,13 @@
 import { useState } from 'react';
 import {
-  Button, Stack, TextField, Typography,
+  Alert,
+  Stack,
+  TextField,
+  Typography,
 } from '@mui/material';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
+import { LoadingButton } from '@mui/lab';
 import { useMyCartQuery, useInitiatePaymentMutation } from '~/generated/graphql';
 import routes from '~/routes';
 
@@ -11,7 +15,7 @@ export default function CartPage() {
   const { data } = useMyCartQuery();
   const [phoneNumber, setPhoneNumber] = useState('');
   const router = useRouter();
-  const [initiatePayment] = useInitiatePaymentMutation(
+  const [initiatePayment, { error }] = useInitiatePaymentMutation(
     { variables: { phoneNumber } },
   );
   return (
@@ -25,6 +29,7 @@ export default function CartPage() {
           {' '}
           kr
         </Typography>
+        {error && <Alert severity="error">Felaktigt telefonnummer</Alert>}
         <TextField
           value={phoneNumber}
           onChange={(e) => {
@@ -34,7 +39,7 @@ export default function CartPage() {
           placeholder="46729438490"
           label="Telefonnummer"
         />
-        <Button
+        <LoadingButton
           sx={{ width: 300 }}
           variant="contained"
           onClick={() => {
@@ -44,7 +49,7 @@ export default function CartPage() {
           }}
         >
           Starta betalning
-        </Button>
+        </LoadingButton>
       </Stack>
     </>
   );
