@@ -16,9 +16,10 @@ import SearchInput from './SearchInput';
 import DarkModeSelector from './components/DarkModeSelector';
 import LanguageSelector from './components/LanguageSelector';
 import AuthenticationStatus from './AuthenticationStatus';
+import { useUser } from '~/providers/UserProvider';
+import NotificationsBell from './components/NotificationsBell';
 import MyCart from './components/MyCart';
 import MyChest from './components/MyChest';
-import { useUser } from '~/providers/UserProvider';
 
 function Layout({ children }: PropsWithChildren<{}>) {
   const theme = useTheme();
@@ -27,7 +28,7 @@ function Layout({ children }: PropsWithChildren<{}>) {
   const { user } = useUser();
   return (
     <Stack direction="row" alignItems="center" spacing={1}>
-      {hideSmall && (
+      {(hideSmall && user) && (
       <SearchInput
         onSelect={(studentId) => {
           router.push(routes.member(studentId));
@@ -43,6 +44,7 @@ function Layout({ children }: PropsWithChildren<{}>) {
       )}
       <LanguageSelector />
       <DarkModeSelector />
+      {user && <NotificationsBell />}
       {children}
     </Stack>
   );

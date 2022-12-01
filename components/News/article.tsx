@@ -6,8 +6,9 @@ import
 import Grid from '@mui/material/Grid';
 import { DateTime } from 'luxon';
 import { useTranslation } from 'next-i18next';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import Image from 'next/image';
 import CommentAmount from '~/components/Social/Comments/CommentAmount';
 import Likers from '~/components/Social/Likers/Likers';
 import LikeButton from '~/components/Social/SocialButton/LikeButton';
@@ -18,11 +19,12 @@ import
   getAuthorStudentId,
   getSignature,
 } from '~/functions/authorFunctions';
-import { timeAgo } from '~/functions/datetimeFunctions';
+
 import selectTranslation from '~/functions/selectTranslation';
 import { ArticleQuery, useLikeArticleMutation, useUnlikeArticleMutation } from '~/generated/graphql';
 import { hasAccess, useApiAccess } from '~/providers/ApiAccessProvider';
 import { useUser } from '~/providers/UserProvider';
+import { timeAgo } from '~/functions/datetimeFunctions';
 import routes from '~/routes';
 import Link from '../Link';
 import Comments from '../Social/Comments/Comments';
@@ -72,16 +74,6 @@ export default function Article({
 
   const markdown = selectTranslation(i18n, article.body, article.bodyEn);
 
-  const [truncateBody, setTruncateBody] = useState(true);
-
-  useEffect(() => {
-    if (fullArticle) {
-      setTruncateBody(false);
-    } else if (markdownRef?.current) {
-      setTruncateBody(markdownRef.current.clientHeight > 200);
-    }
-  }, [markdownRef.current]);
-
   return (
     <Paper className={classes.article} component="article">
       <Stack>
@@ -105,16 +97,15 @@ export default function Article({
                 }}
               />
             </Link>
-            <Stack>
+            <Stack spacing={0.5}>
               <Link
                 href={routes.member(getAuthorStudentId(article.author))}
-                style={{ whiteSpace: 'break-spaces' }}
               >
                 {getSignature(article.author)}
               </Link>
-              {/* {date.setLocale(i18n.language).toLocaleString(DateTime.DATETIME_SHORT)} */}
-              {timeAgo(date)}
-              <Typography variant="body2" />
+              <Typography>
+                {timeAgo(date)}
+              </Typography>
             </Stack>
 
             {/* Edit button */}
@@ -128,16 +119,28 @@ export default function Article({
             )}
           </Stack>
 
-          {/* Article Image */}
-          {article.imageUrl && (
-            <img src={article.imageUrl} className={classes.image} alt="" />
-          )}
           {/* Header */}
           <Link href={routes.article(article.slug || article.id)}>
             <Typography variant="h5" className={classes.header}>
               {selectTranslation(i18n, article.header, article.headerEn)}
             </Typography>
           </Link>
+          {(fullArticle && article.imageUrl) && (
+          <div style={{
+            position: 'relative', height: '300px', width: '100%', margin: '1rem 0',
+          }}
+          >
+            <Image
+              layout="fill"
+              src={article.imageUrl}
+              objectFit="cover"
+              style={{
+                borderRadius: '20px',
+              }}
+              alt=""
+            />
+          </div>
+          )}
           {/* Tags */}
           {article.tags.length > 0 && (
             <Box flexDirection="row" flexWrap="wrap">
@@ -146,27 +149,23 @@ export default function Article({
             </Box>
           )}
           {/* Body */}
+          {fullArticle && (
           <Box
             ref={markdownRef}
-            sx={truncateBody ? {
-              maxHeight: 200,
-              overflow: 'hidden',
-              WebkitMaskImage: '-webkit-gradient(linear, left 80%, left bottom, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)))',
-              maskImage: 'gradient(linear, left 80%, left bottom, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)))',
-            } : undefined}
           >
             <ReactMarkdown
               components={{
                 a: Link,
               }}
             >
-              {truncateBody ? `${markdown.slice(0, 200)}...` : markdown}
+              {markdown}
             </ReactMarkdown>
           </Box>
+          )}
         </Grid>
 
         {/* Read more button */}
-        {truncateBody && (
+        {!fullArticle && (
           <Link href={routes.article(article.slug || article.id)}>{t('read_more')}</Link>
         )}
 
@@ -183,30 +182,39 @@ export default function Article({
         </Stack>
 
         {/* Actions */}
+        {fullArticle && (
+          <>
+            <Stack
+              direction="row"
+              width="100%"
+              alignItems="center"
+              justifyContent="space-around"
+            >
+              <LikeButton
+                isLikedByMe={article.isLikedByMe}
+                toggleLike={() => toggleLike()}
+                access="news:article:like"
+              />
+              <CommentButton toggleComment={() => commentInputRef.current.focus()} access="news:article:comment" />
+            </Stack>
 
-        <Stack
-          direction="row"
-          width="100%"
-          alignItems="center"
-          justifyContent="space-around"
-        >
-          <LikeButton
-            isLikedByMe={article.isLikedByMe}
-            toggleLike={() => toggleLike()}
-            access="news:article:like"
-          />
-          <CommentButton toggleComment={() => commentInputRef.current.focus()} access="news:article:comment" />
-        </Stack>
-
-        <Comments
-          id={article.id}
-          comments={article.comments}
-          type="article"
-          commentInputRef={commentInputRef}
-          showAll={showAll}
-          setShowAll={setShowAll}
+            <Comments
+              id={article.id}
+              comments={article.comments}
+              type="article"
+              commentInputRef={commentInputRef}
+              showAll={showAll}
+              setShowAll={setShowAll}
+            />
+          </>
+        )}
+        {!fullArticle && (
+        <LikeButton
+          isLikedByMe={article.isLikedByMe}
+          toggleLike={() => toggleLike()}
+          access="news:article:like"
         />
-
+        )}
       </Stack>
     </Paper>
   );

@@ -1,4 +1,6 @@
-import { Paper, Stack, Typography } from '@mui/material';
+import {
+  Paper, Stack, Typography,
+} from '@mui/material';
 import { styled } from '@mui/system';
 import React from 'react';
 import { useTranslation } from 'next-i18next';
@@ -11,12 +13,18 @@ import { hasAccess, useApiAccess } from '~/providers/ApiAccessProvider';
 const Container = styled(Paper)`
   display: flex;
   flex-direction: column;
-  padding: 2rem;
+  padding: 1rem;
   margin: 1rem;
 `;
 
 const PositionTitle = styled(Typography)`
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
+  word-break: break-all;
+  hyphens: auto;
+`;
+
+const PositionDescription = styled(Typography)`
+  margin-bottom: 1rem;
 `;
 
 function Position({
@@ -35,10 +43,15 @@ function Position({
         maxWidth: { xs: '95%', sm: 450, xl: 500 },
       }}
     >
-      <PositionTitle variant="h4" style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+      <PositionTitle variant="h4">
         {selectTranslation(i18n, position.name, position.nameEn)}
       </PositionTitle>
-      <Stack marginBottom="2rem" spacing={1}>
+      {position.description && (
+        <PositionDescription>
+          {selectTranslation(i18n, position.description, position.descriptionEn)}
+        </PositionDescription>
+      )}
+      <Stack spacing={1}>
         <Typography>
           {t(
             position?.activeMandates.length > 0
@@ -47,11 +60,13 @@ function Position({
           )}
         </Typography>
         {position?.activeMandates.map((mandate) => (
-          <Mandate mandate={{ ...mandate, __typename: 'FastMandate' }} key={mandate.id} refetch={refetch} />
+          <Mandate mandate={mandate} key={mandate.id} refetch={refetch} />
         ))}
       </Stack>
       {hasAccess(apiContext, 'core:mandate:create') && (
-        <CreateMandate position={position} refetch={refetch} />
+        <Stack marginTop="2rem">
+          <CreateMandate position={position} refetch={refetch} />
+        </Stack>
       )}
     </Container>
   );

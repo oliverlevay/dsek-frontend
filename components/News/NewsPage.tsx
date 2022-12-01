@@ -1,47 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import {
-  Grid, Stack, IconButton, Button,
+  Grid, Stack, IconButton, Button, Pagination,
 } from '@mui/material';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
 import { useRouter } from 'next/router';
-import { useNewsPageInfoQuery } from '~/generated/graphql';
+import { useNewsPageQuery } from '~/generated/graphql';
 import ArticleSet from '~/components/News/articleSet';
-import NewsStepper from '~/components/News/NewsStepper';
 import routes from '~/routes';
 import { hasAccess, useApiAccess } from '~/providers/ApiAccessProvider';
 import NewsFilter from './NewsFilter';
 import ArticleSearchInput from './ArticleSearchInput';
 
-const articlesPerPage = 5;
+const articlesPerPage = 10;
 
 export default function NewsPage() {
   const router = useRouter();
-  const [pageIndex, setPageIndex] = useState(0);
-  const [tagIds, setTagIds] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
   const { t } = useTranslation('common');
-  const { data } = useNewsPageInfoQuery({
-    variables: { page_number: pageIndex, per_page: articlesPerPage },
+  const currentPage = parseInt(router.query.page as string, 10) || 1;
+  const currentTags = router.query.tags ? (router.query.tags as string).split(',') : [];
+  const { data } = useNewsPageQuery({
+    variables: { page_number: currentPage, per_page: articlesPerPage, tagIds: currentTags },
   });
   const apiContext = useApiAccess();
 
-  useEffect(() => {
-    const pageNumberParameter = new URLSearchParams(window.location.href).get('page');
-    const pageNumber = pageNumberParameter ? parseInt(pageNumberParameter, 10) : 0;
-    setPageIndex(pageNumber);
-  }, []);
-
   const totalPages = data?.news?.pageInfo?.totalPages || 1;
-
-  const goBack = () => {
-    router.push(`/news?page=${pageIndex - 1}`);
-    setPageIndex((oldPageIndex) => oldPageIndex - 1);
-  };
-
-  const goForward = () => {
-    router.push(`/news?page=${pageIndex + 1}`);
-    setPageIndex((oldPageIndex) => oldPageIndex + 1);
-  };
 
   return (
     <Grid
@@ -74,17 +58,27 @@ export default function NewsPage() {
         <div style={{ marginBottom: '1rem' }}>
           <ArticleSearchInput onSelect={(slug, id) => router.push(routes.article(slug || id))} />
         </div>
-        <NewsFilter tagIds={tagIds} setTagIds={setTagIds} />
+        <NewsFilter
+          tagIds={currentTags}
+          setTagIds={(newTags) => {
+            setLoading(true);
+            router.push(`?tags=${newTags}`);
+          }}
+        />
         <ArticleSet
           articlesPerPage={articlesPerPage}
-          pageIndex={pageIndex}
-          tagIds={tagIds}
+          pageIndex={currentPage}
+          tagIds={currentTags}
+          loading={loading}
+          setLoading={setLoading}
         />
-        <NewsStepper
-          pages={totalPages}
-          index={pageIndex}
-          onForwardClick={goForward}
-          onBackwardClick={goBack}
+        <Pagination
+          page={currentPage}
+          count={totalPages}
+          onChange={(_, page) => {
+            setLoading(true);
+            router.push(`?page=${page}&tags=${currentTags}`);
+          }}
         />
       </Grid>
     </Grid>

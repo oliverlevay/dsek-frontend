@@ -41,6 +41,39 @@ export type AdminMutations = {
   updateSearchIndex?: Maybe<Scalars['Boolean']>;
 };
 
+export type Alert = {
+  __typename?: 'Alert';
+  id: Scalars['UUID'];
+  message: Scalars['String'];
+  messageEn: Scalars['String'];
+  severity: AlertColor;
+};
+
+export enum AlertColor {
+  Error = 'error',
+  Info = 'info',
+  Success = 'success',
+  Warning = 'warning'
+}
+
+export type AlertMutations = {
+  __typename?: 'AlertMutations';
+  create?: Maybe<Alert>;
+  remove?: Maybe<Alert>;
+};
+
+
+export type AlertMutationsCreateArgs = {
+  message: Scalars['String'];
+  messageEn: Scalars['String'];
+  severity: AlertColor;
+};
+
+
+export type AlertMutationsRemoveArgs = {
+  id: Scalars['UUID'];
+};
+
 export type Api = {
   __typename?: 'Api';
   accessPolicies?: Maybe<Array<AccessPolicy>>;
@@ -272,12 +305,12 @@ export type Committee = {
   __typename?: 'Committee';
   id: Scalars['UUID'];
   name?: Maybe<Scalars['String']>;
-  shortName?: Maybe<Scalars['String']>;
+  shortName: Scalars['String'];
 };
 
 export type CommitteeFilter = {
   id?: InputMaybe<Scalars['UUID']>;
-  name?: InputMaybe<Scalars['String']>;
+  short_name?: InputMaybe<Scalars['String']>;
 };
 
 export type CommitteeMutations = {
@@ -350,6 +383,7 @@ export type CreateBookingRequest = {
 
 export type CreateCommittee = {
   name: Scalars['String'];
+  short_name: Scalars['String'];
 };
 
 export type CreateDoor = {
@@ -454,6 +488,13 @@ export type DoorMutationsCreateArgs = {
 
 export type DoorMutationsRemoveArgs = {
   name: Scalars['String'];
+};
+
+export type EmailUser = {
+  __typename?: 'EmailUser';
+  email?: Maybe<Scalars['String']>;
+  keycloakId: Scalars['String'];
+  studentId: Scalars['String'];
 };
 
 export type Event = {
@@ -588,6 +629,7 @@ export type FileMutations = {
   __typename?: 'FileMutations';
   move?: Maybe<Array<Maybe<FileChange>>>;
   remove?: Maybe<Array<Maybe<FileData>>>;
+  removeMyProfilePicture?: Maybe<Array<Maybe<FileData>>>;
   rename?: Maybe<FileChange>;
 };
 
@@ -602,6 +644,11 @@ export type FileMutationsMoveArgs = {
 export type FileMutationsRemoveArgs = {
   bucket: Scalars['String'];
   fileNames: Array<Scalars['String']>;
+};
+
+
+export type FileMutationsRemoveMyProfilePictureArgs = {
+  fileName: Scalars['String'];
 };
 
 
@@ -642,7 +689,7 @@ export type MailAliasPolicy = {
 export type MailRecipient = {
   __typename?: 'MailRecipient';
   alias: Scalars['String'];
-  emails?: Maybe<Array<Scalars['String']>>;
+  emailUsers: Array<EmailUser>;
 };
 
 export type Mandate = {
@@ -783,6 +830,7 @@ export type Mutation = {
   access?: Maybe<AccessMutations>;
   addToMyCart?: Maybe<Cart>;
   admin?: Maybe<AdminMutations>;
+  alert?: Maybe<AlertMutations>;
   alias?: Maybe<MailAliasMutations>;
   article?: Maybe<ArticleMutations>;
   bookable?: Maybe<BookableMutations>;
@@ -790,10 +838,13 @@ export type Mutation = {
   committee?: Maybe<CommitteeMutations>;
   consumeItem: UserInventory;
   createProduct: Array<Maybe<Product>>;
+  deleteNotification: Array<Notification>;
+  deleteNotifications: Array<Notification>;
   event?: Maybe<EventMutations>;
   files?: Maybe<FileMutations>;
   initiatePayment: Payment;
   mandate?: Maybe<MandateMutations>;
+  markAsRead: Array<Notification>;
   markdown?: Maybe<MarkdownMutations>;
   member?: Maybe<MemberMutations>;
   position?: Maybe<PositionMutations>;
@@ -821,8 +872,23 @@ export type MutationCreateProductArgs = {
 };
 
 
+export type MutationDeleteNotificationArgs = {
+  id: Scalars['UUID'];
+};
+
+
+export type MutationDeleteNotificationsArgs = {
+  ids: Array<Scalars['UUID']>;
+};
+
+
 export type MutationInitiatePaymentArgs = {
   phoneNumber: Scalars['String'];
+};
+
+
+export type MutationMarkAsReadArgs = {
+  ids: Array<Scalars['UUID']>;
 };
 
 
@@ -835,6 +901,18 @@ export type MutationRemoveFromMyCartArgs = {
 export type MutationUpdatePaymentStatusArgs = {
   paymentId: Scalars['String'];
   status: PaymentStatus;
+};
+
+export type Notification = {
+  __typename?: 'Notification';
+  createdAt: Scalars['Date'];
+  id: Scalars['ID'];
+  link: Scalars['String'];
+  message: Scalars['String'];
+  readAt?: Maybe<Scalars['Date']>;
+  title: Scalars['String'];
+  type: Scalars['String'];
+  updatedAt: Scalars['Date'];
 };
 
 export type Order = {
@@ -905,6 +983,8 @@ export type Position = {
   activeMandates?: Maybe<Array<Maybe<Mandate>>>;
   boardMember?: Maybe<Scalars['Boolean']>;
   committee?: Maybe<Committee>;
+  description?: Maybe<Scalars['String']>;
+  descriptionEn?: Maybe<Scalars['String']>;
   email?: Maybe<Scalars['String']>;
   id: Scalars['String'];
   name?: Maybe<Scalars['String']>;
@@ -912,7 +992,9 @@ export type Position = {
 };
 
 export type PositionFilter = {
+  active?: InputMaybe<Scalars['Boolean']>;
   committee_id?: InputMaybe<Scalars['UUID']>;
+  committee_short_name?: InputMaybe<Scalars['String']>;
   id?: InputMaybe<Scalars['String']>;
   name?: InputMaybe<Scalars['String']>;
 };
@@ -990,6 +1072,7 @@ export type Query = {
   _entities: Array<Maybe<_Entity>>;
   _service: _Service;
   alarmShouldBeActive: Scalars['Boolean'];
+  alerts: Array<Alert>;
   alias?: Maybe<MailAlias>;
   aliases?: Maybe<Array<Maybe<MailAlias>>>;
   api?: Maybe<Api>;
@@ -1015,6 +1098,7 @@ export type Query = {
   memberById?: Maybe<Member>;
   members?: Maybe<MemberPagination>;
   myCart?: Maybe<Cart>;
+  myNotifications: Array<Notification>;
   news?: Maybe<ArticlePagination>;
   payment?: Maybe<Payment>;
   positions?: Maybe<PositionPagination>;
@@ -1383,7 +1467,7 @@ export type UserInventoryItem = {
   variant?: Maybe<Scalars['String']>;
 };
 
-export type _Entity = AccessPolicy | Api | Article | Bookable | BookableCategory | BookingRequest | Committee | Door | Event | FastMandate | FileData | MailAlias | MailAliasPolicy | Mandate | Markdown | Member | Position | Tag | Token;
+export type _Entity = AccessPolicy | Alert | Api | Article | Bookable | BookableCategory | BookingRequest | Committee | Door | Event | FastMandate | FileData | MailAlias | MailAliasPolicy | Mandate | Markdown | Member | Position | Tag | Token;
 
 export type _Service = {
   __typename?: '_Service';
@@ -1443,6 +1527,27 @@ export type SeedDatabaseMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type SeedDatabaseMutation = { __typename?: 'Mutation', admin?: { __typename?: 'AdminMutations', seed?: boolean | null } | null };
+
+export type AlertsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AlertsQuery = { __typename?: 'Query', alerts: Array<{ __typename?: 'Alert', id: any, message: string, messageEn: string, severity: AlertColor }> };
+
+export type CreateAlertMutationVariables = Exact<{
+  message: Scalars['String'];
+  messageEn: Scalars['String'];
+  severity: AlertColor;
+}>;
+
+
+export type CreateAlertMutation = { __typename?: 'Mutation', alert?: { __typename?: 'AlertMutations', create?: { __typename?: 'Alert', id: any, message: string, messageEn: string, severity: AlertColor } | null } | null };
+
+export type RemoveAlertMutationVariables = Exact<{
+  id: Scalars['UUID'];
+}>;
+
+
+export type RemoveAlertMutation = { __typename?: 'Mutation', alert?: { __typename?: 'AlertMutations', remove?: { __typename?: 'Alert', id: any, message: string, messageEn: string, severity: AlertColor } | null } | null };
 
 export type GetBookablesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1553,7 +1658,7 @@ export type ConsumeItemMutation = { __typename?: 'Mutation', consumeItem: { __ty
 export type GetCommitteesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetCommitteesQuery = { __typename?: 'Query', committees?: { __typename?: 'CommitteePagination', committees: Array<{ __typename?: 'Committee', id: any, name?: string | null } | null> } | null };
+export type GetCommitteesQuery = { __typename?: 'Query', committees?: { __typename?: 'CommitteePagination', committees: Array<{ __typename?: 'Committee', id: any, name?: string | null, shortName: string } | null> } | null };
 
 export type GetDoorsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1739,6 +1844,13 @@ export type RemoveObjectsMutationVariables = Exact<{
 
 export type RemoveObjectsMutation = { __typename?: 'Mutation', files?: { __typename?: 'FileMutations', remove?: Array<{ __typename?: 'FileData', id: string, name: string } | null> | null } | null };
 
+export type RemoveMyProfilePictureMutationVariables = Exact<{
+  fileName: Scalars['String'];
+}>;
+
+
+export type RemoveMyProfilePictureMutation = { __typename?: 'Mutation', files?: { __typename?: 'FileMutations', removeMyProfilePicture?: Array<{ __typename?: 'FileData', id: string, name: string } | null> | null } | null };
+
 export type MoveObjectsMutationVariables = Exact<{
   bucket: Scalars['String'];
   fileNames: Array<Scalars['String']> | Scalars['String'];
@@ -1784,10 +1896,15 @@ export type CreateMailAliasMutationVariables = Exact<{
 
 export type CreateMailAliasMutation = { __typename?: 'Mutation', alias?: { __typename?: 'MailAliasMutations', create?: { __typename?: 'MailAlias', email: string } | null } | null };
 
-export type ResolveRecipientsQueryVariables = Exact<{ [key: string]: never; }>;
+export type ResolveRecipientsEmailQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ResolveRecipientsQuery = { __typename?: 'Query', resolveRecipients: Array<{ __typename?: 'MailRecipient', alias: string, emails?: Array<string> | null } | null> };
+export type ResolveRecipientsEmailQuery = { __typename?: 'Query', resolveRecipients: Array<{ __typename?: 'MailRecipient', alias: string, emailUsers: Array<{ __typename?: 'EmailUser', email?: string | null }> } | null> };
+
+export type ResolveRecipientsStudentIdQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ResolveRecipientsStudentIdQuery = { __typename?: 'Query', resolveRecipients: Array<{ __typename?: 'MailRecipient', alias: string, emailUsers: Array<{ __typename?: 'EmailUser', studentId: string }> } | null> };
 
 export type GetMandatesByPeriodQueryVariables = Exact<{
   page: Scalars['Int'];
@@ -1992,6 +2109,25 @@ export type GetUploadDataMutationVariables = Exact<{
 
 export type GetUploadDataMutation = { __typename?: 'Mutation', article?: { __typename?: 'ArticleMutations', getUploadData?: { __typename?: 'UploadData', uploadUrl: string } | null } | null };
 
+export type NotificationsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type NotificationsQuery = { __typename?: 'Query', myNotifications: Array<{ __typename?: 'Notification', id: string, type: string, createdAt: any, updatedAt: any, title: string, message: string, link: string, readAt?: any | null }> };
+
+export type MarkAsReadMutationVariables = Exact<{
+  ids: Array<Scalars['UUID']> | Scalars['UUID'];
+}>;
+
+
+export type MarkAsReadMutation = { __typename?: 'Mutation', markAsRead: Array<{ __typename?: 'Notification', id: string, type: string, createdAt: any, updatedAt: any, title: string, message: string, link: string, readAt?: any | null }> };
+
+export type DeleteNotificationsMutationVariables = Exact<{
+  ids: Array<Scalars['UUID']> | Scalars['UUID'];
+}>;
+
+
+export type DeleteNotificationsMutation = { __typename?: 'Mutation', deleteNotifications: Array<{ __typename?: 'Notification', id: string, type: string, createdAt: any, updatedAt: any, title: string, message: string, link: string, readAt?: any | null }> };
+
 export type InitiatePaymentMutationVariables = Exact<{
   phoneNumber: Scalars['String'];
 }>;
@@ -2016,10 +2152,11 @@ export type GetPaymentQuery = { __typename?: 'Query', payment?: { __typename?: '
 
 export type PositionsByCommitteeQueryVariables = Exact<{
   committeeId?: InputMaybe<Scalars['UUID']>;
+  shortName?: InputMaybe<Scalars['String']>;
 }>;
 
 
-export type PositionsByCommitteeQuery = { __typename?: 'Query', positions?: { __typename?: 'PositionPagination', positions: Array<{ __typename?: 'Position', id: string, name?: string | null, nameEn?: string | null, committee?: { __typename?: 'Committee', name?: string | null, shortName?: string | null } | null, activeMandates?: Array<{ __typename?: 'Mandate', id: any, start_date: any, end_date: any, position?: { __typename?: 'Position', name?: string | null, nameEn?: string | null, id: string } | null, member?: { __typename?: 'Member', id: any, student_id?: string | null, first_name?: string | null, last_name?: string | null } | null } | null> | null } | null>, pageInfo: { __typename?: 'PaginationInfo', hasNextPage: boolean } } | null };
+export type PositionsByCommitteeQuery = { __typename?: 'Query', positions?: { __typename?: 'PositionPagination', positions: Array<{ __typename?: 'Position', id: string, name?: string | null, nameEn?: string | null, description?: string | null, descriptionEn?: string | null, committee?: { __typename?: 'Committee', name?: string | null, shortName: string } | null, activeMandates?: Array<{ __typename?: 'Mandate', id: any, start_date: any, end_date: any, position?: { __typename?: 'Position', name?: string | null, nameEn?: string | null, id: string } | null, member?: { __typename?: 'Member', id: any, picture_path?: string | null, student_id?: string | null, first_name?: string | null, last_name?: string | null } | null } | null> | null } | null>, pageInfo: { __typename?: 'PaginationInfo', hasNextPage: boolean } } | null };
 
 export type AllPositionsQueryVariables = Exact<{
   committeeId?: InputMaybe<Scalars['UUID']>;
@@ -2366,6 +2503,121 @@ export function useSeedDatabaseMutation(baseOptions?: Apollo.MutationHookOptions
 export type SeedDatabaseMutationHookResult = ReturnType<typeof useSeedDatabaseMutation>;
 export type SeedDatabaseMutationResult = Apollo.MutationResult<SeedDatabaseMutation>;
 export type SeedDatabaseMutationOptions = Apollo.BaseMutationOptions<SeedDatabaseMutation, SeedDatabaseMutationVariables>;
+export const AlertsDocument = gql`
+    query Alerts {
+  alerts {
+    id
+    message
+    messageEn
+    severity
+  }
+}
+    `;
+
+/**
+ * __useAlertsQuery__
+ *
+ * To run a query within a React component, call `useAlertsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAlertsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAlertsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useAlertsQuery(baseOptions?: Apollo.QueryHookOptions<AlertsQuery, AlertsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AlertsQuery, AlertsQueryVariables>(AlertsDocument, options);
+      }
+export function useAlertsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AlertsQuery, AlertsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AlertsQuery, AlertsQueryVariables>(AlertsDocument, options);
+        }
+export type AlertsQueryHookResult = ReturnType<typeof useAlertsQuery>;
+export type AlertsLazyQueryHookResult = ReturnType<typeof useAlertsLazyQuery>;
+export type AlertsQueryResult = Apollo.QueryResult<AlertsQuery, AlertsQueryVariables>;
+export const CreateAlertDocument = gql`
+    mutation CreateAlert($message: String!, $messageEn: String!, $severity: AlertColor!) {
+  alert {
+    create(message: $message, messageEn: $messageEn, severity: $severity) {
+      id
+      message
+      messageEn
+      severity
+    }
+  }
+}
+    `;
+export type CreateAlertMutationFn = Apollo.MutationFunction<CreateAlertMutation, CreateAlertMutationVariables>;
+
+/**
+ * __useCreateAlertMutation__
+ *
+ * To run a mutation, you first call `useCreateAlertMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateAlertMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createAlertMutation, { data, loading, error }] = useCreateAlertMutation({
+ *   variables: {
+ *      message: // value for 'message'
+ *      messageEn: // value for 'messageEn'
+ *      severity: // value for 'severity'
+ *   },
+ * });
+ */
+export function useCreateAlertMutation(baseOptions?: Apollo.MutationHookOptions<CreateAlertMutation, CreateAlertMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateAlertMutation, CreateAlertMutationVariables>(CreateAlertDocument, options);
+      }
+export type CreateAlertMutationHookResult = ReturnType<typeof useCreateAlertMutation>;
+export type CreateAlertMutationResult = Apollo.MutationResult<CreateAlertMutation>;
+export type CreateAlertMutationOptions = Apollo.BaseMutationOptions<CreateAlertMutation, CreateAlertMutationVariables>;
+export const RemoveAlertDocument = gql`
+    mutation RemoveAlert($id: UUID!) {
+  alert {
+    remove(id: $id) {
+      id
+      message
+      messageEn
+      severity
+    }
+  }
+}
+    `;
+export type RemoveAlertMutationFn = Apollo.MutationFunction<RemoveAlertMutation, RemoveAlertMutationVariables>;
+
+/**
+ * __useRemoveAlertMutation__
+ *
+ * To run a mutation, you first call `useRemoveAlertMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveAlertMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeAlertMutation, { data, loading, error }] = useRemoveAlertMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useRemoveAlertMutation(baseOptions?: Apollo.MutationHookOptions<RemoveAlertMutation, RemoveAlertMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RemoveAlertMutation, RemoveAlertMutationVariables>(RemoveAlertDocument, options);
+      }
+export type RemoveAlertMutationHookResult = ReturnType<typeof useRemoveAlertMutation>;
+export type RemoveAlertMutationResult = Apollo.MutationResult<RemoveAlertMutation>;
+export type RemoveAlertMutationOptions = Apollo.BaseMutationOptions<RemoveAlertMutation, RemoveAlertMutationVariables>;
 export const GetBookablesDocument = gql`
     query GetBookables {
   bookables(includeDisabled: false) {
@@ -3031,6 +3283,7 @@ export const GetCommitteesDocument = gql`
     committees {
       id
       name
+      shortName
     }
   }
 }
@@ -4032,6 +4285,42 @@ export function useRemoveObjectsMutation(baseOptions?: Apollo.MutationHookOption
 export type RemoveObjectsMutationHookResult = ReturnType<typeof useRemoveObjectsMutation>;
 export type RemoveObjectsMutationResult = Apollo.MutationResult<RemoveObjectsMutation>;
 export type RemoveObjectsMutationOptions = Apollo.BaseMutationOptions<RemoveObjectsMutation, RemoveObjectsMutationVariables>;
+export const RemoveMyProfilePictureDocument = gql`
+    mutation RemoveMyProfilePicture($fileName: String!) {
+  files {
+    removeMyProfilePicture(fileName: $fileName) {
+      id
+      name
+    }
+  }
+}
+    `;
+export type RemoveMyProfilePictureMutationFn = Apollo.MutationFunction<RemoveMyProfilePictureMutation, RemoveMyProfilePictureMutationVariables>;
+
+/**
+ * __useRemoveMyProfilePictureMutation__
+ *
+ * To run a mutation, you first call `useRemoveMyProfilePictureMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveMyProfilePictureMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeMyProfilePictureMutation, { data, loading, error }] = useRemoveMyProfilePictureMutation({
+ *   variables: {
+ *      fileName: // value for 'fileName'
+ *   },
+ * });
+ */
+export function useRemoveMyProfilePictureMutation(baseOptions?: Apollo.MutationHookOptions<RemoveMyProfilePictureMutation, RemoveMyProfilePictureMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RemoveMyProfilePictureMutation, RemoveMyProfilePictureMutationVariables>(RemoveMyProfilePictureDocument, options);
+      }
+export type RemoveMyProfilePictureMutationHookResult = ReturnType<typeof useRemoveMyProfilePictureMutation>;
+export type RemoveMyProfilePictureMutationResult = Apollo.MutationResult<RemoveMyProfilePictureMutation>;
+export type RemoveMyProfilePictureMutationOptions = Apollo.BaseMutationOptions<RemoveMyProfilePictureMutation, RemoveMyProfilePictureMutationVariables>;
 export const MoveObjectsDocument = gql`
     mutation moveObjects($bucket: String!, $fileNames: [String!]!, $destination: String!) {
   files {
@@ -4279,41 +4568,80 @@ export function useCreateMailAliasMutation(baseOptions?: Apollo.MutationHookOpti
 export type CreateMailAliasMutationHookResult = ReturnType<typeof useCreateMailAliasMutation>;
 export type CreateMailAliasMutationResult = Apollo.MutationResult<CreateMailAliasMutation>;
 export type CreateMailAliasMutationOptions = Apollo.BaseMutationOptions<CreateMailAliasMutation, CreateMailAliasMutationVariables>;
-export const ResolveRecipientsDocument = gql`
-    query ResolveRecipients {
+export const ResolveRecipientsEmailDocument = gql`
+    query ResolveRecipientsEmail {
   resolveRecipients {
     alias
-    emails
+    emailUsers {
+      email
+    }
   }
 }
     `;
 
 /**
- * __useResolveRecipientsQuery__
+ * __useResolveRecipientsEmailQuery__
  *
- * To run a query within a React component, call `useResolveRecipientsQuery` and pass it any options that fit your needs.
- * When your component renders, `useResolveRecipientsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useResolveRecipientsEmailQuery` and pass it any options that fit your needs.
+ * When your component renders, `useResolveRecipientsEmailQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useResolveRecipientsQuery({
+ * const { data, loading, error } = useResolveRecipientsEmailQuery({
  *   variables: {
  *   },
  * });
  */
-export function useResolveRecipientsQuery(baseOptions?: Apollo.QueryHookOptions<ResolveRecipientsQuery, ResolveRecipientsQueryVariables>) {
+export function useResolveRecipientsEmailQuery(baseOptions?: Apollo.QueryHookOptions<ResolveRecipientsEmailQuery, ResolveRecipientsEmailQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<ResolveRecipientsQuery, ResolveRecipientsQueryVariables>(ResolveRecipientsDocument, options);
+        return Apollo.useQuery<ResolveRecipientsEmailQuery, ResolveRecipientsEmailQueryVariables>(ResolveRecipientsEmailDocument, options);
       }
-export function useResolveRecipientsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ResolveRecipientsQuery, ResolveRecipientsQueryVariables>) {
+export function useResolveRecipientsEmailLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ResolveRecipientsEmailQuery, ResolveRecipientsEmailQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<ResolveRecipientsQuery, ResolveRecipientsQueryVariables>(ResolveRecipientsDocument, options);
+          return Apollo.useLazyQuery<ResolveRecipientsEmailQuery, ResolveRecipientsEmailQueryVariables>(ResolveRecipientsEmailDocument, options);
         }
-export type ResolveRecipientsQueryHookResult = ReturnType<typeof useResolveRecipientsQuery>;
-export type ResolveRecipientsLazyQueryHookResult = ReturnType<typeof useResolveRecipientsLazyQuery>;
-export type ResolveRecipientsQueryResult = Apollo.QueryResult<ResolveRecipientsQuery, ResolveRecipientsQueryVariables>;
+export type ResolveRecipientsEmailQueryHookResult = ReturnType<typeof useResolveRecipientsEmailQuery>;
+export type ResolveRecipientsEmailLazyQueryHookResult = ReturnType<typeof useResolveRecipientsEmailLazyQuery>;
+export type ResolveRecipientsEmailQueryResult = Apollo.QueryResult<ResolveRecipientsEmailQuery, ResolveRecipientsEmailQueryVariables>;
+export const ResolveRecipientsStudentIdDocument = gql`
+    query ResolveRecipientsStudentId {
+  resolveRecipients {
+    alias
+    emailUsers {
+      studentId
+    }
+  }
+}
+    `;
+
+/**
+ * __useResolveRecipientsStudentIdQuery__
+ *
+ * To run a query within a React component, call `useResolveRecipientsStudentIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useResolveRecipientsStudentIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useResolveRecipientsStudentIdQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useResolveRecipientsStudentIdQuery(baseOptions?: Apollo.QueryHookOptions<ResolveRecipientsStudentIdQuery, ResolveRecipientsStudentIdQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ResolveRecipientsStudentIdQuery, ResolveRecipientsStudentIdQueryVariables>(ResolveRecipientsStudentIdDocument, options);
+      }
+export function useResolveRecipientsStudentIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ResolveRecipientsStudentIdQuery, ResolveRecipientsStudentIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ResolveRecipientsStudentIdQuery, ResolveRecipientsStudentIdQueryVariables>(ResolveRecipientsStudentIdDocument, options);
+        }
+export type ResolveRecipientsStudentIdQueryHookResult = ReturnType<typeof useResolveRecipientsStudentIdQuery>;
+export type ResolveRecipientsStudentIdLazyQueryHookResult = ReturnType<typeof useResolveRecipientsStudentIdLazyQuery>;
+export type ResolveRecipientsStudentIdQueryResult = Apollo.QueryResult<ResolveRecipientsStudentIdQuery, ResolveRecipientsStudentIdQueryVariables>;
 export const GetMandatesByPeriodDocument = gql`
     query GetMandatesByPeriod($page: Int!, $perPage: Int!, $start_date: Date, $end_date: Date) {
   mandatePagination(
@@ -5533,6 +5861,127 @@ export function useGetUploadDataMutation(baseOptions?: Apollo.MutationHookOption
 export type GetUploadDataMutationHookResult = ReturnType<typeof useGetUploadDataMutation>;
 export type GetUploadDataMutationResult = Apollo.MutationResult<GetUploadDataMutation>;
 export type GetUploadDataMutationOptions = Apollo.BaseMutationOptions<GetUploadDataMutation, GetUploadDataMutationVariables>;
+export const NotificationsDocument = gql`
+    query Notifications {
+  myNotifications {
+    id
+    type
+    createdAt
+    updatedAt
+    title
+    message
+    link
+    readAt
+  }
+}
+    `;
+
+/**
+ * __useNotificationsQuery__
+ *
+ * To run a query within a React component, call `useNotificationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useNotificationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useNotificationsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useNotificationsQuery(baseOptions?: Apollo.QueryHookOptions<NotificationsQuery, NotificationsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<NotificationsQuery, NotificationsQueryVariables>(NotificationsDocument, options);
+      }
+export function useNotificationsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<NotificationsQuery, NotificationsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<NotificationsQuery, NotificationsQueryVariables>(NotificationsDocument, options);
+        }
+export type NotificationsQueryHookResult = ReturnType<typeof useNotificationsQuery>;
+export type NotificationsLazyQueryHookResult = ReturnType<typeof useNotificationsLazyQuery>;
+export type NotificationsQueryResult = Apollo.QueryResult<NotificationsQuery, NotificationsQueryVariables>;
+export const MarkAsReadDocument = gql`
+    mutation MarkAsRead($ids: [UUID!]!) {
+  markAsRead(ids: $ids) {
+    id
+    type
+    createdAt
+    updatedAt
+    title
+    message
+    link
+    readAt
+  }
+}
+    `;
+export type MarkAsReadMutationFn = Apollo.MutationFunction<MarkAsReadMutation, MarkAsReadMutationVariables>;
+
+/**
+ * __useMarkAsReadMutation__
+ *
+ * To run a mutation, you first call `useMarkAsReadMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMarkAsReadMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [markAsReadMutation, { data, loading, error }] = useMarkAsReadMutation({
+ *   variables: {
+ *      ids: // value for 'ids'
+ *   },
+ * });
+ */
+export function useMarkAsReadMutation(baseOptions?: Apollo.MutationHookOptions<MarkAsReadMutation, MarkAsReadMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MarkAsReadMutation, MarkAsReadMutationVariables>(MarkAsReadDocument, options);
+      }
+export type MarkAsReadMutationHookResult = ReturnType<typeof useMarkAsReadMutation>;
+export type MarkAsReadMutationResult = Apollo.MutationResult<MarkAsReadMutation>;
+export type MarkAsReadMutationOptions = Apollo.BaseMutationOptions<MarkAsReadMutation, MarkAsReadMutationVariables>;
+export const DeleteNotificationsDocument = gql`
+    mutation DeleteNotifications($ids: [UUID!]!) {
+  deleteNotifications(ids: $ids) {
+    id
+    type
+    createdAt
+    updatedAt
+    title
+    message
+    link
+    readAt
+  }
+}
+    `;
+export type DeleteNotificationsMutationFn = Apollo.MutationFunction<DeleteNotificationsMutation, DeleteNotificationsMutationVariables>;
+
+/**
+ * __useDeleteNotificationsMutation__
+ *
+ * To run a mutation, you first call `useDeleteNotificationsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteNotificationsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteNotificationsMutation, { data, loading, error }] = useDeleteNotificationsMutation({
+ *   variables: {
+ *      ids: // value for 'ids'
+ *   },
+ * });
+ */
+export function useDeleteNotificationsMutation(baseOptions?: Apollo.MutationHookOptions<DeleteNotificationsMutation, DeleteNotificationsMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteNotificationsMutation, DeleteNotificationsMutationVariables>(DeleteNotificationsDocument, options);
+      }
+export type DeleteNotificationsMutationHookResult = ReturnType<typeof useDeleteNotificationsMutation>;
+export type DeleteNotificationsMutationResult = Apollo.MutationResult<DeleteNotificationsMutation>;
+export type DeleteNotificationsMutationOptions = Apollo.BaseMutationOptions<DeleteNotificationsMutation, DeleteNotificationsMutationVariables>;
 export const InitiatePaymentDocument = gql`
     mutation InitiatePayment($phoneNumber: String!) {
   initiatePayment(phoneNumber: $phoneNumber) {
@@ -5654,12 +6103,17 @@ export type GetPaymentQueryHookResult = ReturnType<typeof useGetPaymentQuery>;
 export type GetPaymentLazyQueryHookResult = ReturnType<typeof useGetPaymentLazyQuery>;
 export type GetPaymentQueryResult = Apollo.QueryResult<GetPaymentQuery, GetPaymentQueryVariables>;
 export const PositionsByCommitteeDocument = gql`
-    query PositionsByCommittee($committeeId: UUID) {
-  positions(filter: {committee_id: $committeeId}, perPage: 1000) {
+    query PositionsByCommittee($committeeId: UUID, $shortName: String) {
+  positions(
+    filter: {committee_id: $committeeId, committee_short_name: $shortName}
+    perPage: 1000
+  ) {
     positions {
       id
       name
       nameEn
+      description
+      descriptionEn
       committee {
         name
         shortName
@@ -5675,6 +6129,7 @@ export const PositionsByCommitteeDocument = gql`
         }
         member {
           id
+          picture_path
           student_id
           first_name
           last_name
@@ -5701,6 +6156,7 @@ export const PositionsByCommitteeDocument = gql`
  * const { data, loading, error } = usePositionsByCommitteeQuery({
  *   variables: {
  *      committeeId: // value for 'committeeId'
+ *      shortName: // value for 'shortName'
  *   },
  * });
  */

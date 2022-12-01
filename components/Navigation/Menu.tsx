@@ -12,6 +12,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import FormatColorTextIcon from '@mui/icons-material/FormatColorText';
 import LibraryMusicIcon from '@mui/icons-material/LibraryMusic';
 import StorefrontIcon from '@mui/icons-material/Storefront';
+import CollectionsIcon from '@mui/icons-material/Collections';
 import { DateTime } from 'luxon';
 import EditCalendarIcon from '../Icons/EditCalendarIcon';
 import routes from '~/routes';
@@ -44,7 +45,7 @@ const menu: NavigationItem[] = [
     translationKey: 'Webshop',
     path: routes.webshop,
     icon: <StorefrontIcon color="primary" />,
-    hasAccess: () => true,
+    hasAccess: (apiContext) => hasAccess(apiContext, 'webshop:read'),
   },
   {
     translationKey: 'documents',
@@ -177,6 +178,12 @@ const menu: NavigationItem[] = [
       },
 
     ],
+  },
+  {
+    translationKey: 'photos',
+    path: routes.photos,
+    icon: <CollectionsIcon color="primary" />,
+    hasAccess: () => true,
   },
   {
     translationKey: 'songs',

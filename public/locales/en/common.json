@@ -18,7 +18,7 @@
   "regulations": "Regulations",
   "statutes": "Statutes",
   "meetingDocuments": "Meeting documents",
-  "pictures": "Pictures",
+  "photos": "Photos",
   "songs": "Songs",
   "next": "Next",
   "back": "Back",
@@ -88,5 +88,6 @@
   "are_interested": "are interested",
   "kravprofiler": "Requirement profiles",
   "ok": "OK",
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+  "siteName": "D-Guild"
 }
